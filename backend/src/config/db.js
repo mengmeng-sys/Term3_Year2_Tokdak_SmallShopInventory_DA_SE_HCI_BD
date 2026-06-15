@@ -1,5 +1,5 @@
-import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
+const mysql = require('mysql2/promise');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -21,11 +21,13 @@ console.log({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 });
-try {
-  const connection = await pool.getConnection();
-  console.log("✅ Database connected successfully!");
-  connection.release(); // give the connection back to the pool
-} catch (error) {
-  console.error("❌ Database connection failed:", error.message);
-}
-export default pool;
+(async ()=>{
+  try {
+    const connection = await pool.getConnection();
+    console.log("✅ Database connected successfully!");
+    connection.release(); // give the connection back to the pool
+  } catch (error) {
+    console.error("❌ Database connection failed:", error.message);
+  }
+})
+module.exports = pool;
