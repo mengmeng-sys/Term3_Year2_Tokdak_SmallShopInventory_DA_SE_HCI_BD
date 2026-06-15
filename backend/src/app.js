@@ -1,3 +1,4 @@
+// all module we use commonJS  const func = require('file path') and we dont have to put file ext too
 const express = require('express');
 const cors = require('cors');
 const { swaggerUi, swaggerSpec } = require('./config/swagger');
