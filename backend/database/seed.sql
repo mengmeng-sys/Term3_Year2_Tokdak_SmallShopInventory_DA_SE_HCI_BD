@@ -10,11 +10,11 @@ USE tokdak;
 -- 1. USERS
 -- ============================================================
 INSERT INTO users (name, email, password, role, DOB, gender) VALUES
-('Seng Mengseang', 'admin@tokdak.com',  '$2b$10$hashedpassword1', 'admin',  '1998-05-12', 'male'),
-('Dara Chan',      'dara@gmail.com',    '$2b$10$hashedpassword2', 'client', '1990-03-22', 'male'),
-('Sokha Lim',      'sokha@gmail.com',   '$2b$10$hashedpassword3', 'client', '1985-07-15', 'female'),
-('Mony Pich',      'mony@gmail.com',    '$2b$10$hashedpassword4', 'client', '1993-11-08', 'female'),
-('Virak Noun',     'virak@gmail.com',   '$2b$10$hashedpassword5', 'client', '1988-01-30', 'male');
+('Seng Mengseang', 'admin@tokdak.com',  '$2b$10$36PPrQ1GEG.HRzdS8lW.9uWSShVO5tPyai3YHE4ceYUGGcsdASXhe', 'admin',  '1998-05-12', 'male'),
+('Dara Chan',      'dara@gmail.com',    '$2b$10$36PPrQ1GEG.HRzdS8lW.9uWSShVO5tPyai3YHE4ceYUGGcsdASXhe', 'client', '1990-03-22', 'male'),
+('Sokha Lim',      'sokha@gmail.com',   '$2b$10$36PPrQ1GEG.HRzdS8lW.9uWSShVO5tPyai3YHE4ceYUGGcsdASXhe', 'client', '1985-07-15', 'female'),
+('Mony Pich',      'mony@gmail.com',    '$2b$10$36PPrQ1GEG.HRzdS8lW.9uWSShVO5tPyai3YHE4ceYUGGcsdASXhe', 'client', '1993-11-08', 'female'),
+('Virak Noun',     'virak@gmail.com',   '$2b$10$36PPrQ1GEG.HRzdS8lW.9uWSShVO5tPyai3YHE4ceYUGGcsdASXhe', 'client', '1988-01-30', 'male');
 
 -- ============================================================
 -- 2. SHOPS
@@ -124,3 +124,7 @@ INSERT INTO backups (shop_id, user_id, file_name, file_size, status, note) VALUE
 (2, 3, 'tokdak_shop2_20260601.sql', 102400, 'success', 'Manual backup before update'),
 (3, 4, 'tokdak_shop3_20260601.sql',  51200, 'failed',  'Backup failed due to disk space'),
 (4, 5, 'tokdak_shop4_20260601.sql',  76800, 'success', 'Scheduled monthly backup');
+
+use tokdak;
+show tables;
+select * from users;
