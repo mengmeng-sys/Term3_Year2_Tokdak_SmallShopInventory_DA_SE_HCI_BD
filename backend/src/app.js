@@ -7,6 +7,7 @@ const loggerMiddleware = require('./middlewares/logger.middleware');
 
 // Routes
 const authRoutes    = require('./routes/auth.routes');
+const backupRoutes  = require('./routes/backup.routes');
 const productRoutes = require('./routes/product.routes');
 const stockRoutes   = require('./routes/stock.routes');
 const shopRoutes    = require('./routes/shop.routes');
@@ -25,6 +26,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API Routes
 app.use('/api/auth',     authRoutes);
+app.use('/api/backups', backupRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/stock',    stockRoutes);
 app.use('/api/shops',    shopRoutes);
