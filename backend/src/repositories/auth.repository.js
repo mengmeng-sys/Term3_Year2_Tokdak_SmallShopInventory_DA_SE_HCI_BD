@@ -64,10 +64,33 @@ const updatePassword = async (userId,newHashedPassword) =>{
         [newHashedPassword,userId]
     );
 };
+//OTP operation with DB
+const saveResetOtp= async (email,otp,expiresAt) =>{
+    await pool.query(
+        'update users set reset_otp = ?, reset_otp_expires = ? where email = ?',
+        [otp, expiresAt, email]
+    );
+};
+const findByEmailWithOtp = async (email) => {
+    const [rows] = await pool.query(
+        'select * from users where email = ?',
+        [email]
+    )
+    return rows[0];
+};
+const clearResetOtp = async (userId) => {
+    await pool.query(
+        'update users set reset_otp = null, reset_otp_expires= null where user_id = ?',
+        [userId]
+    );
+};
 module.exports = {
     findByEmail,
     findEmailExists,
     createUserWithShop,
     findById,
-    updatePassword
+    updatePassword,
+    saveResetOtp,
+    findByEmailWithOtp,
+    clearResetOtp
 };
