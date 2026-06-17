@@ -10,4 +10,6 @@ router.post('/login',authController.login);
 router.post('/register',authMiddleware,roleMiddleware('admin'),authController.register);
 router.get('/me',authMiddleware,authController.getMe);
 router.put('/change-password',authMiddleware,authController.changePassword);
+router.post('/forgot-password',authController.forgotPassword);
+router.post('/reset-password-otp',authController.resetPasswordWithOtp);
 module.exports = router;
