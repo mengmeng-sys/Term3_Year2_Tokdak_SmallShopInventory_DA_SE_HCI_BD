@@ -9,4 +9,5 @@ router.get('/',(req,res)=>{
 router.post('/login',authController.login);
 router.post('/register',authMiddleware,roleMiddleware('admin'),authController.register);
 router.get('/me',authMiddleware,authController.getMe);
+router.put('/change-password',authMiddleware,authController.changePassword);
 module.exports = router;
