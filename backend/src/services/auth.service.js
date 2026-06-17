@@ -57,5 +57,26 @@ const getMe = async (userId) => {
     if(!user) throw {status : 404, message:'User Not Found'};
 
     return user;
-}
-module.exports ={login,register,getMe};
+};
+const changePassword = async (userId, oldPassword, newPassword) => {
+    const user = await authRepository.findById(userId);
+    if (!user) throw { status: 404, message: 'User Not Found' };
+     // 2. We need the password hash, but findById doesn't return it
+    // So fetch by email instead, or add a separate query
+    const fullUser = await authRepository.findByEmail(user.email);
+
+    // 3. Verify the old password matches
+    const isMatch = await bcrypt.compare(oldPassword, fullUser.password);
+    if (!isMatch) {
+        throw { status: 401, message: 'Current password is incorrect' };
+    }
+
+    // 4. Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // 5. Update it in the database
+    await authRepository.updatePassword(userId, hashedNewPassword);
+
+    return { message: 'Password updated successfully' };
+};
+module.exports ={login,register,getMe,changePassword};

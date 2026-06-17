@@ -57,6 +57,21 @@ const getMe = async (req, res, next) =>{
         }
         next(err);
     }
-}
+};
+const changePassword = async (req,res,next) =>{
+    try{
+        const userId = req.user.id;
+        const {oldPassword, newPassword} = req.body;
 
-module.exports = {login,register,getMe};
+        if(!oldPassword || !newPassword){
+            return res.status(400).json({message: 'Old and New password are required'});
+        }
+        const result = await authService.changePassword(userId,oldPassword,newPassword);
+        res.status(200).json({message:result.message})
+    }catch(err){
+        if(err.status){
+            return res.status(200).json({message:err.message});    
+        }
+    }
+};
+module.exports = {login,register,getMe,changePassword};

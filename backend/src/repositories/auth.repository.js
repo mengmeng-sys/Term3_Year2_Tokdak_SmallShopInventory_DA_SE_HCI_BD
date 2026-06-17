@@ -57,11 +57,17 @@ const findById = async (userId) => {
         [userId]
     );
     return rows[0];
-}
-
+};
+const updatePassword = async (userId,newHashedPassword) =>{
+    await pool.query(
+        'update users set password = ? where user_id = ?',
+        [newHashedPassword,userId]
+    );
+};
 module.exports = {
     findByEmail,
     findEmailExists,
     createUserWithShop,
-    findById
+    findById,
+    updatePassword
 };
