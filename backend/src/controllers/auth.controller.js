@@ -74,4 +74,37 @@ const changePassword = async (req,res,next) =>{
         }
     }
 };
-module.exports = {login,register,getMe,changePassword};
+const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        const result = await authService.forgotPassword(email);
+        res.status(200).json({ message: result.message });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+const resetPasswordWithOtp = async (req, res, next) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ message: 'Email, OTP, and new password are required' });
+        }
+
+        const result = await authService.resetPasswordWithOtp(email, otp, newPassword);
+        res.status(200).json({ message: result.message });
+
+    } catch (err) {
+        if (err.status) {
+            return res.status(err.status).json({ message: err.message });
+        }
+        next(err);
+    }
+};
+module.exports = {login,register,getMe,changePassword,forgotPassword,resetPasswordWithOtp};
