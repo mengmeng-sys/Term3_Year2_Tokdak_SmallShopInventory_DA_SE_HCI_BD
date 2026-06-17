@@ -19,7 +19,7 @@ const updateUser = async (userId, updateData) => {
     const {name, email, DOB, gender } = updateData;
 
     const [result] = await pool.query(
-        'UPDATE users set name = ?, email = ?, DOB = ?, gender = ? WHERE user_id = ? and role != "admin"',
+        "UPDATE users set name = ?, email = ?, DOB = ?, gender = ? WHERE user_id = ? and role != 'admin'",
         [name, email, DOB, gender, userId]
     )
     return result;
@@ -27,7 +27,7 @@ const updateUser = async (userId, updateData) => {
 
 const removeUser = async (userId) => {
     const [result] = await pool.query(
-        'DELETE FROM users WHERE user_id = ? and role != "admin"',
+        "DELETE FROM users WHERE user_id = ? and role != 'admin'",
         [userId]
     );
 

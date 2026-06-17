@@ -5,12 +5,7 @@ where email ="admin@tokdak.com";
 
 use tokdak;
 select * from users;
-select * from users where email = 'admin@tokdak.com';
 --ad otp table
 ALTER TABLE users 
 ADD COLUMN reset_otp VARCHAR(6) NULL,
 ADD COLUMN reset_otp_expires DATETIME NULL;
-
-show databases;
-show tables;
-desc users;

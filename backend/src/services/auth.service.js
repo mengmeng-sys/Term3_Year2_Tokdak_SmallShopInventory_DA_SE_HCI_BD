@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {sendEmail} = require('../config/mailer');
 const authRepository = require('../repositories/auth.repository');
 
 //login 
@@ -80,39 +79,4 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 
     return { message: 'Password updated successfully' };
 };
-//otp section
-const forgotPassword = async (email) =>{
-    const user = await authRepository.findByEmail(email);
-    if(!user){
-        // Don't reveal whether the email exists, for security
-        return { message: 'If this email exists, an OTP has been sent' };  
-    }
-
-    //Generate a random 6-digit OTP
-    const otp = Math.floor(100000 + Math.random()*900000).toString();
-
-    //set expiry for 10 mn from now or from when they ask for
-    const expiresAt = new Date(Date.now()+10*60*1000);
-    await authRepository.saveResetOtp(email,otp,expiresAt);
-    await sendEmail(email, 'forgot_password', { otp });
-
-    return {message: 'If this email exists, an OTP has been sent'}
-};
-
-const resetPasswordWithOtp = async (email, otp, newPassword)=>{
-    const user = await authRepository.findByEmail(email);
-    if(!user) throw {status:400 ,message:'Wrong Email no user found'};
-    if(!user.reset_otp) throw {status:400, message:'Please request a new OTP'};
-    if(user.reset_otp !== otp) throw {status:400 , message: 'Incorrect OTP'};
-    if(new Date() > new Date(user.reset_otp_expires)) throw {status :400 , message:'OTP has expired. Please request a new one'};
-
-    //if you pass all condition
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await authRepository.updatePassword(user.user_id, hashedPassword);
-    await authRepository.clearResetOtp(user.user_id);
-    await sendEmail(email, 'password_changed', user);
-    return { message: 'Password reset successfully' };
-}
-
-module.exports ={login,register,getMe,changePassword,forgotPassword,resetPasswordWithOtp};
+module.exports ={login,register,getMe,changePassword};
