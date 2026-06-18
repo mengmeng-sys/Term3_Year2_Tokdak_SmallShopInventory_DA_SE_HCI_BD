@@ -14,6 +14,14 @@ const findShopById = async (shopId) => {
     );
     return rows[0];
 }
+const findByUserId = async (userId) => {
+    const [rows] = await pool.query(
+        'SELECT shop_id, user_id, shop_name, address, phone, created_at FROM shops WHERE user_id = ?',
+        [userId]
+    );
+    return rows[0];
+}
+
 
 const updateShop = async (shopId, updateData) => {
     const { shop_name, address, phone } = updateData;
@@ -35,6 +43,7 @@ const deleteShop = async (shopId) => {
 module.exports = {
     findAllShops,
     findShopById,
+    findByUserId,
     updateShop,
     deleteShop
 };

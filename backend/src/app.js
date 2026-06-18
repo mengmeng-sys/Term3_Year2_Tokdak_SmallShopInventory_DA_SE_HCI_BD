@@ -13,6 +13,8 @@ const stockRoutes   = require('./routes/stock.routes');
 const shopRoutes    = require('./routes/shop.routes');
 const reportRoutes  = require('./routes/report.routes');
 const userRoutes    = require('./routes/user.routes');
+const categoryRoutes = require('./routes/category.routes');
+
 
 const app = express();
 
@@ -32,6 +34,7 @@ app.use('/api/stock',    stockRoutes);
 app.use('/api/shops',    shopRoutes);
 app.use('/api/reports',  reportRoutes);
 app.use('/api/users',    userRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Error handler
 app.use(errorMiddleware);
