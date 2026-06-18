@@ -4,7 +4,9 @@ const categoryController = require('../controllers/category.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 
 const roleMiddleware = require('../middlewares/role.middleware');
-
+router.get('/test',(req,res)=>{
+ res.json({message:"category router is working."})
+})
 router.post(
     '/',
     authMiddleware,

@@ -5,6 +5,8 @@ where email ="admin@tokdak.com";
 
 use tokdak;
 select * from users;
+
+select * from products where shop_id=1;
 show create table shops;
 --ad otp table
 ALTER TABLE users 

@@ -84,9 +84,10 @@ const changePassword = async (userId, oldPassword, newPassword) => {
 //otp section
 const forgotPassword = async (email) =>{
     const user = await authRepository.findByEmail(email);
+    console.log(user);
     if(!user){
         // Don't reveal whether the email exists, for security
-        return { message: 'If this email exists, an OTP has been sent' };  
+        return { message: `User not found by this email : ${email}` };  
     }
 
     //Generate a random 6-digit OTP
@@ -112,7 +113,8 @@ const resetPasswordWithOtp = async (email, otp, newPassword)=>{
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await authRepository.updatePassword(user.user_id, hashedPassword);
     await authRepository.clearResetOtp(user.user_id);
-    await sendEmail(email, 'password_changed', user);
+    console.log(newPassword,email);
+    await sendEmail(email,'password_changed', user);
     return { message: 'Password reset successfully' };
 }
 

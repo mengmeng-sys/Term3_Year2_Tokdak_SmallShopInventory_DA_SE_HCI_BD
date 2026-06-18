@@ -3,6 +3,9 @@ const authMiddleware = require('../middlewares/auth.middleware')
 const roleMiddleware = require('../middlewares/role.middleware')
 const backupController = require('../controllers/backup.controller')
 const router = express.Router();
+router.get('/test',(req,res)=>{
+ res.json({message:"Backup router is working."})
+})
 router.get('/',authMiddleware,roleMiddleware('admin'),backupController.getAllBackups);
 router.get('/:id',authMiddleware,roleMiddleware('admin'),backupController.getBackupById);
 router.post('/',authMiddleware,roleMiddleware('admin'),backupController.createBackup);
