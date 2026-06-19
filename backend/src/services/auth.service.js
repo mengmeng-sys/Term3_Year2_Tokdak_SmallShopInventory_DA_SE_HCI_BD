@@ -32,27 +32,132 @@ const login = async ( email , password) =>{
 
 }
 const register = async (userData, shopData) => {
-    // 1. Check if email already exists
-    const emailExists = await authRepository.findEmailExists(userData.email);
-    if (emailExists) {
-        throw { status: 409, message: 'Email already registered' };
+    await authRepository.removeUserTemp(
+        userData.email
+    );
+    const emailExists =
+        await authRepository.findEmailExists(
+            userData.email
+        );
+
+    if(emailExists){
+        throw {
+            status:409,
+            message:'Email already registered'
+        };
     }
 
-    // 2. Hash the password before storing
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const hashedPassword =
+        await bcrypt.hash(
+            userData.password,
+            10
+        );
 
-    // 3. Create user + shop together
-    const result = await authRepository.createUserWithShop(
-        { ...userData, password: hashedPassword },
-        shopData
+    const otp =
+        Math.floor(
+            100000 + Math.random()*900000
+        ).toString();
+
+    const expiresAt =
+        new Date(
+            Date.now() + 10 * 60 * 1000
+        );
+
+    await authRepository.insertUserTemp(
+        userData,
+        shopData,
+        hashedPassword,
+        otp,
+        expiresAt
+    );
+
+    await sendEmail(
+        userData.email,
+        'email_verify',
+        {
+            name:userData.name,
+            otp
+        }
     );
 
     return {
-        message: 'Client account created successfully',
+        message:'Verification code sent'
+    };
+};
+const verifyRegistration = async (
+    email,
+    otp
+) => {
+
+    const tempUser =
+        await authRepository.findUserTempByEmail(
+            email
+        );
+    console.log(tempUser,email)
+    if(!tempUser){
+        throw {
+            status:404,
+            message:'Registration request not found'
+        };
+    }
+
+    if(tempUser.reset_otp !== otp){
+        throw {
+            status:400,
+            message:'Incorrect OTP'
+        };
+    }
+
+    if(
+        new Date() >
+        new Date(tempUser.reset_otp_expires)
+    ){
+        throw {
+            status:400,
+            message:'OTP expired'
+        };
+    }
+
+    const userData = {
+        name: tempUser.name,
+        email: tempUser.email,
+        password: tempUser.password
+    };
+
+    const shopData = {
+        shop_name: tempUser.shop_name,
+        address: tempUser.address,
+        phone: tempUser.phone
+    };
+
+    const result =
+        await authRepository.createUserWithShop(
+            userData,
+            shopData
+        );
+
+    await authRepository.removeUserTemp(
+        email
+    );
+
+    await sendEmail(
+        email,
+        'registration',
+        {
+            name: tempUser.name,
+            email: tempUser.email,
+            shop_name: tempUser.shop_name,
+            password:tempUser.password
+        }
+    );
+
+    return {
+        message:'Registration completed successfully',
         user_id: result.user_id,
         shop_id: result.shop_id
     };
 };
+
 const getMe = async (userId) => {
     const user = await authRepository.findById(userId);
     if(!user) throw {status : 404, message:'User Not Found'};
@@ -65,7 +170,7 @@ const changePassword = async (userId, oldPassword, newPassword) => {
      // 2. We need the password hash, but findById doesn't return it
     // So fetch by email instead, or add a separate query
     const fullUser = await authRepository.findByEmail(user.email);
-
+    
     // 3. Verify the old password matches
     const isMatch = await bcrypt.compare(oldPassword, fullUser.password);
     if (!isMatch) {
@@ -96,7 +201,7 @@ const forgotPassword = async (email) =>{
     //set expiry for 10 mn from now or from when they ask for
     const expiresAt = new Date(Date.now()+10*60*1000);
     await authRepository.saveResetOtp(email,otp,expiresAt);
-    await sendEmail(email, 'forgot_password', { otp });
+    await sendEmail(email,'forgot_password', { otp });
 
     return {message: 'If this email exists, an OTP has been sent'}
 };
@@ -113,9 +218,22 @@ const resetPasswordWithOtp = async (email, otp, newPassword)=>{
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await authRepository.updatePassword(user.user_id, hashedPassword);
     await authRepository.clearResetOtp(user.user_id);
-    console.log(newPassword,email);
-    await sendEmail(email,'password_changed', user);
-    return { message: 'Password reset successfully' };
-}
+    try {
+    await sendEmail(
+        email,
+        'password_changed',
+        user
+    );
 
-module.exports ={login,register,getMe,changePassword,forgotPassword,resetPasswordWithOtp};
+        console.log('Password changed email sent');
+
+    } catch (error) {
+        console.error(
+            'Password changed email failed:',
+            error
+        );
+   }
+    return { message: 'Password reset successfully' };
+};
+
+module.exports ={login,register,verifyRegistration,getMe,changePassword,forgotPassword,resetPasswordWithOtp};

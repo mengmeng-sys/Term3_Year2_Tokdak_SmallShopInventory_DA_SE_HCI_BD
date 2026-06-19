@@ -65,6 +65,61 @@ const updatePassword = async (userId,newHashedPassword) =>{
     );
 };
 //OTP operation with DB
+const insertUserTemp = async (
+    userData,
+    shopData,
+    hashedPassword,
+    otp,
+    expiresAt
+) => {
+
+    await pool.query(
+        `
+        INSERT INTO userTemp
+        (
+            name,
+            email,
+            password,
+            shop_name,
+            address,
+            phone,
+            reset_otp,
+            reset_otp_expires
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+            userData.name,
+            userData.email,
+            hashedPassword,
+            shopData.shop_name,
+            shopData.address,
+            shopData.phone,
+            otp,
+            expiresAt
+        ]
+    );
+};
+const findUserTempByEmail = async (email) => {
+
+    const [rows] = await pool.query(
+        `
+        SELECT *
+        FROM userTemp
+        WHERE email = ?
+        `,
+        [email]
+    );
+
+    return rows[0];
+};
+const removeUserTemp = async (email) => {
+    await pool.query(
+        `DELETE FROM userTemp 
+         WHERE email = ?;`,
+         [email]
+    )
+}
 const saveResetOtp= async (email,otp,expiresAt) =>{
     await pool.query(
         'update users set reset_otp = ?, reset_otp_expires = ? where email = ?',
@@ -92,5 +147,8 @@ module.exports = {
     updatePassword,
     saveResetOtp,
     findByEmailWithOtp,
-    clearResetOtp
+    clearResetOtp,
+    insertUserTemp,
+    removeUserTemp,
+    findUserTempByEmail
 };

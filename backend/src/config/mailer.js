@@ -101,9 +101,8 @@ const emailTemplates = {
         </div>
         `
     }),
-
     password_changed: (data) => ({
-        subject: 'TOKDAK Password Changed',
+        subject: 'TOKDAK — Your Password Has Been Changed',
         html: `
         <div style="font-family: Arial, sans-serif; background:#f5f7fa; padding:40px;">
             <div style="max-width:600px; margin:auto; background:white; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
@@ -112,30 +111,91 @@ const emailTemplates = {
                     <p style="color:#FFE7D1; margin-top:8px;">Security Notification</p>
                 </div>
                 <div style="padding:35px;">
-                    <h2 style="color:#333;">Password Updated Successfully</h2>
+                    <h2 style="color:#333;">Password Changed Successfully</h2>
                     <p style="color:#666; line-height:1.6;">
-                        Hi <b>${data?.name || 'User'}</b>,
-                    </p>
-                    <p style="color:#666; line-height:1.6;">
-                        Your password was changed successfully.
+                        Hi <b>${data?.name || 'User'}</b>, your TOKDAK account password was just changed successfully.
                     </p>
                     <div style="
-                        background:#EAFBF1;
-                        color:#22A06B;
-                        padding:18px;
-                        border-radius:10px;
+                        background:#FFF8F3;
+                        border-left:4px solid #FF6B00;
+                        padding:15px 20px;
+                        border-radius:8px;
                         margin:25px 0;
-                        font-weight:bold;
+                        color:#555;
                     ">
-                        ✅ Your account security has been updated.
+                        If you made this change, no further action is needed.
                     </div>
-                    <p style="color:#666;">
-                        If you did not perform this action, please contact support immediately and reset your password.
+                    <p style="color:#999; font-size:14px;">
+                        If you did NOT make this change, please contact your Admin immediately or use Forgot Password to secure your account.
                     </p>
                 </div>
                 <div style="background:#fafafa; padding:20px; text-align:center; color:#888; font-size:12px;">
                     © TOKDAK Inventory System
                 </div>
+            </div>
+        </div>
+        `
+    }),
+    email_verify: (data) => ({
+        subject: 'Verify Your TOKDAK Account',
+        html: `
+        <div style="background:#f4f6f8;padding:40px 20px;font-family:'Segoe UI',Arial,sans-serif;">
+            <div style="max-width:650px;margin:auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,.08);">
+
+                <div style="background:linear-gradient(135deg,#FF6B00,#FF914D);padding:35px;text-align:center;">
+                    <h1 style="margin:0;color:white;">📧 TOKDAK</h1>
+                    <p style="margin-top:10px;color:#FFE6D6;">
+                        Email Verification Required
+                    </p>
+                </div>
+
+                <div style="padding:40px;">
+
+                    <h2 style="color:#222;">
+                        Welcome to TOKDAK, ${data.name}!
+                    </h2>
+
+                    <p style="color:#666;line-height:1.8;">
+                        To activate your account and keep your shop secure,
+                        please verify your email address using the code below.
+                    </p>
+
+                    <div style="margin:35px 0;text-align:center;">
+                        <div style="
+                            display:inline-block;
+                            background:#FFF4EC;
+                            border:2px dashed #FF6B00;
+                            padding:20px 40px;
+                            border-radius:16px;
+                            font-size:42px;
+                            font-weight:bold;
+                            letter-spacing:8px;
+                            color:#FF6B00;
+                        ">
+                            ${data.otp}
+                        </div>
+                    </div>
+
+                    <p style="text-align:center;color:#555;">
+                        Verification code expires in <strong>10 minutes</strong>.
+                    </p>
+
+                    <div style="
+                        background:#FFF8F3;
+                        border-left:4px solid #FF6B00;
+                        padding:15px;
+                        border-radius:8px;
+                        margin-top:25px;
+                    ">
+                        After verification, your account will be activated and ready to use.
+                    </div>
+
+                </div>
+
+                <div style="background:#fafafa;padding:20px;text-align:center;color:#999;font-size:12px;">
+                    © TOKDAK Inventory System
+                </div>
+
             </div>
         </div>
         `

@@ -3,8 +3,10 @@ require('dotenv').config();
 const {sendEmail} = require('./src/config/mailer');
 
 const PORT = process.env.PORT || 5000;
-const vid ={name:'vid'};
-sendEmail("mseang804@gmail.com",'registration',vid);
+
+// sendEmail("mseang804@gmail.com",'forgot_password',{otp:"122312"});
+//  sendEmail("mseang804@gmail.com",'email_verify',{name:"andre",otp:"122312"});
+
 app.listen(PORT, () => {
   console.log(`TOKDAK server running on port ${PORT} and URL:http://localhost:5000`);
 });

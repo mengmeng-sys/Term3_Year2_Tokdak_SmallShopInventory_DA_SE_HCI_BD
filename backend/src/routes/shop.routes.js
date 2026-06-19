@@ -7,8 +7,8 @@ router.get('/test',(req,res)=>{
  res.json({message:"Shop router is working."})
 })
 router.get('/', authMiddleware, roleMiddleware('admin'), shopController.getAllShops);
-router.get('/:id', authMiddleware, shopController.getShopById);
+router.get('/:id', authMiddleware,shopController.getShopById);
 router.put('/:id', authMiddleware, shopController.updateShop);
-router.delete('/:id', authMiddleware, shopController.deleteShop);
+router.delete('/:id', authMiddleware,shopController.deleteShop);
 
 module.exports = router;

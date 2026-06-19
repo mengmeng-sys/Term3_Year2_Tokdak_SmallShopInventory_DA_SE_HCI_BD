@@ -35,14 +35,55 @@ const register = async (req, res, next) => {
         const result = await authService.register(userData, shopData);
 
         res.status(201).json({
-            message: 'Registration successful',
-            data: result
+            message: result.message
         });
 
     } catch (err) {
         if (err.status) {
             return res.status(err.status).json({ message: err.message });
         }
+        next(err);
+    }
+};
+const verifyRegistration = async (
+    req,
+    res,
+    next
+) => {
+
+    try {
+
+        const { email, otp } =
+            req.body;
+
+        if(!email || !otp){
+            return res.status(400).json({
+                message:
+                    'Email and OTP are required'
+            });
+        }
+
+        const result =
+            await authService.verifyRegistration(
+                email,
+                otp
+            );
+
+        res.status(201).json({
+            message: result.message,
+            data: result
+        });
+
+    } catch(err){
+
+        if(err.status){
+            return res.status(
+                err.status
+            ).json({
+                message: err.message
+            });
+        }
+
         next(err);
     }
 };
@@ -107,4 +148,4 @@ const resetPasswordWithOtp = async (req, res, next) => {
         next(err);
     }
 };
-module.exports = {login,register,getMe,changePassword,forgotPassword,resetPasswordWithOtp};
+module.exports = {login,register,verifyRegistration,getMe,changePassword,forgotPassword,resetPasswordWithOtp};
