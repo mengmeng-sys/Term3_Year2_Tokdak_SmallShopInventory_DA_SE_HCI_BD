@@ -70,6 +70,9 @@ const register = async (userData, shopData) => {
         otp,
         expiresAt
     );
+    // debug 
+    console.log('OTP:', otp);
+    console.log('Sending verification email to:', userData.email);
 
     await sendEmail(
         userData.email,
@@ -79,6 +82,7 @@ const register = async (userData, shopData) => {
             otp
         }
     );
+    console.log('Verification email sent');
 
     return {
         message:'Verification code sent'
@@ -121,7 +125,10 @@ const verifyRegistration = async (
     const userData = {
         name: tempUser.name,
         email: tempUser.email,
-        password: tempUser.password
+        password:tempUser.password,
+        DOB: tempUser.DOB,
+        gender:tempUser.gender
+        
     };
 
     const shopData = {
@@ -147,7 +154,7 @@ const verifyRegistration = async (
             name: tempUser.name,
             email: tempUser.email,
             shop_name: tempUser.shop_name,
-            password:tempUser.password
+            password:tempUser.rPassword
         }
     );
 

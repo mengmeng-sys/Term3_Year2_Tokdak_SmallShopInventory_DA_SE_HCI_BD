@@ -137,73 +137,19 @@ const emailTemplates = {
         `
     }),
     email_verify: (data) => ({
-        subject: 'Verify Your TOKDAK Account',
+        subject: 'Test OTP',
         html: `
-        <div style="background:#f4f6f8;padding:40px 20px;font-family:'Segoe UI',Arial,sans-serif;">
-            <div style="max-width:650px;margin:auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 12px 35px rgba(0,0,0,.08);">
-
-                <div style="background:linear-gradient(135deg,#FF6B00,#FF914D);padding:35px;text-align:center;">
-                    <h1 style="margin:0;color:white;">📧 TOKDAK</h1>
-                    <p style="margin-top:10px;color:#FFE6D6;">
-                        Email Verification Required
-                    </p>
-                </div>
-
-                <div style="padding:40px;">
-
-                    <h2 style="color:#222;">
-                        Welcome to TOKDAK, ${data.name}!
-                    </h2>
-
-                    <p style="color:#666;line-height:1.8;">
-                        To activate your account and keep your shop secure,
-                        please verify your email address using the code below.
-                    </p>
-
-                    <div style="margin:35px 0;text-align:center;">
-                        <div style="
-                            display:inline-block;
-                            background:#FFF4EC;
-                            border:2px dashed #FF6B00;
-                            padding:20px 40px;
-                            border-radius:16px;
-                            font-size:42px;
-                            font-weight:bold;
-                            letter-spacing:8px;
-                            color:#FF6B00;
-                        ">
-                            ${data.otp}
-                        </div>
-                    </div>
-
-                    <p style="text-align:center;color:#555;">
-                        Verification code expires in <strong>10 minutes</strong>.
-                    </p>
-
-                    <div style="
-                        background:#FFF8F3;
-                        border-left:4px solid #FF6B00;
-                        padding:15px;
-                        border-radius:8px;
-                        margin-top:25px;
-                    ">
-                        After verification, your account will be activated and ready to use.
-                    </div>
-
-                </div>
-
-                <div style="background:#fafafa;padding:20px;text-align:center;color:#999;font-size:12px;">
-                    © TOKDAK Inventory System
-                </div>
-
-            </div>
-        </div>
+            <h1>TOKDAK Verification</h1>
+            <p>Hello ${data.name}</p>
+            <h2>${data.otp}</h2>
         `
     })
 };
 
 // Send email helper
 const sendEmail = async (toEmail, type, data) => {
+    console.log('EMAIL TYPE:', type);
+    console.log('TO:', toEmail);
     const template = emailTemplates[type];
     if (!template) {
         throw new Error(`Unknown email type: ${type}`);
@@ -218,6 +164,7 @@ const sendEmail = async (toEmail, type, data) => {
             subject,
             html
         });
+        console.log('function sent mail is sent.');
     } catch (error) {
         console.error(`Failed to send email of type ${type} to ${toEmail}:`, error);
         throw error; // Rethrowing error so calling controller can catch it

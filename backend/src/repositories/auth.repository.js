@@ -79,24 +79,30 @@ const insertUserTemp = async (
         (
             name,
             email,
-            password,
+            rPassword,
+            DOB,
+            gender,
             shop_name,
             address,
             phone,
+            password,
             reset_otp,
             reset_otp_expires
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
         [
             userData.name,
             userData.email,
-            hashedPassword,
+            userData.password,
+            userData.DOB,
+            userData.gender,
             shopData.shop_name,
             shopData.address,
             shopData.phone,
+            hashedPassword,
             otp,
-            expiresAt
+            expiresAt,
         ]
     );
 };

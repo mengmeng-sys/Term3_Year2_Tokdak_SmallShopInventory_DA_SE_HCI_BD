@@ -16,7 +16,11 @@ CREATE TABLE userTemp(
 
     name VARCHAR(100) NOT NULL,
 
-    password VARCHAR(255) NOT NULL,
+    rPassword VARCHAR(255) not null,
+
+    DOB         DATE,
+
+    gender      ENUM('male','female','other'),
 
     shop_name VARCHAR(150) NOT NULL,
 
@@ -24,15 +28,22 @@ CREATE TABLE userTemp(
 
     phone VARCHAR(20),
 
+    password VARCHAR(255) NOT NULL,
+
     reset_otp VARCHAR(6),
 
     reset_otp_expires DATETIME
 );
-
+alter table `userTemp`
+add COLUMN     DOB         DATE,
+ADD   gender      ENUM('male','female','other');
+add COLUMN  rPassword VARCHAR(255) not null;
 --ad otp table
 ALTER TABLE users 
 ADD COLUMN reset_otp VARCHAR(6) NULL,
 ADD COLUMN reset_otp_expires DATETIME NULL;
+alter table `userTemp` 
+add COLUMN  rPassword VARCHAR(255) not null;
 ALTER TABLE users
 ADD is_active BOOLEAN NOT NULL DEFAULT TRUE;
 update users set email='oumrothana007@gmail.com' where user_id =3;
@@ -41,3 +52,4 @@ show tables;
 desc `userTemp`;
 select * from `userTemp`;
 TRUNCATE table `userTemp`;
+drop table `userTemp`;
