@@ -53,3 +53,4 @@ desc `userTemp`;
 select * from `userTemp`;
 TRUNCATE table `userTemp`;
 drop table `userTemp`;
+select * from alerts ;

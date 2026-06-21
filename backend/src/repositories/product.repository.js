@@ -139,11 +139,18 @@ const remove = async (productId, shopId) => {
 
     return result;
 };
+const updateQuantity = async (productId, shopId, newQuantity) => {
+    await pool.query(
+        'UPDATE products SET current_quantity = ? WHERE product_id = ? AND shop_id = ?',
+        [newQuantity, productId, shopId]
+    );
+};
 
 module.exports = {
     create,
     findAllByShop,
     findById,
     update,
-    remove
+    remove,
+    updateQuantity
 };
