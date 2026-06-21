@@ -15,6 +15,7 @@ const reportRoutes  = require('./routes/report.routes');
 const userRoutes    = require('./routes/user.routes');
 const categoryRoutes = require('./routes/category.routes');
 const alertRoutes = require('./routes/alert.routes')
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 
 const app = express();
@@ -37,6 +38,7 @@ app.use('/api/reports',  reportRoutes);
 app.use('/api/users',    userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/alerts',alertRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Error handler
 app.use(errorMiddleware);
