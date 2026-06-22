@@ -172,6 +172,8 @@ const getMe = async (userId) => {
     return user;
 };
 const changePassword = async (userId, oldPassword, newPassword) => {
+    
+    
     const user = await authRepository.findById(userId);
     if (!user) throw { status: 404, message: 'User Not Found' };
      // 2. We need the password hash, but findById doesn't return it
@@ -183,13 +185,28 @@ const changePassword = async (userId, oldPassword, newPassword) => {
     if (!isMatch) {
         throw { status: 401, message: 'Current password is incorrect' };
     }
+    // 4. make sure it is not the same old password.
+    if (oldPassword === newPassword) {
+        throw {
+            status: 400,
+            message: 'New password must be different from current password'
+        };
+    }
+    // 5. check strong password
+    const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
-    // 4. Hash the new password
+    if (!passwordRegex.test(newPassword)) {
+        throw {
+            status: 400,
+            message: 'Password must contain uppercase, lowercase, number, special character and be at least 8 characters long'
+        };
+    }
+    // 6. Hash the new password
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
-    // 5. Update it in the database
+    
+    // 7. Update it in the database
     await authRepository.updatePassword(userId, hashedNewPassword);
-
+    
     return { message: 'Password updated successfully' };
 };
 
@@ -201,15 +218,15 @@ const forgotPassword = async (email) =>{
         // Don't reveal whether the email exists, for security
         return { message: `User not found by this email : ${email}` };  
     }
-
+    
     //Generate a random 6-digit OTP
     const otp = Math.floor(100000 + Math.random()*900000).toString();
-
+    
     //set expiry for 10 mn from now or from when they ask for
     const expiresAt = new Date(Date.now()+10*60*1000);
     await authRepository.saveResetOtp(email,otp,expiresAt);
     await sendEmail(email,'forgot_password', { otp });
-
+    
     return {message: 'If this email exists, an OTP has been sent'}
 };
 
@@ -219,7 +236,16 @@ const resetPasswordWithOtp = async (email, otp, newPassword)=>{
     if(!user.reset_otp) throw {status:400, message:'Please request a new OTP'};
     if(user.reset_otp !== otp) throw {status:400 , message: 'Incorrect OTP'};
     if(new Date() > new Date(user.reset_otp_expires)) throw {status :400 , message:'OTP has expired. Please request a new one'};
-
+    
+    // check strong password
+    const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    
+    if (!passwordRegex.test(newPassword)) {
+        throw {
+            status: 400,
+            message: 'Password must contain uppercase, lowercase, number, special character and be at least 8 characters long'
+        };
+    }
     //if you pass all condition
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

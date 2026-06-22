@@ -99,20 +99,53 @@ const getMe = async (req, res, next) =>{
         next(err);
     }
 };
-const changePassword = async (req,res,next) =>{
-    try{
-        const userId = req.user.id;
-        const {oldPassword, newPassword} = req.body;
+const changePassword = async (req, res, next) => {
+    try {
 
-        if(!oldPassword || !newPassword){
-            return res.status(400).json({message: 'Old and New password are required'});
+        const userId = req.user.id;
+
+        const {
+            oldPassword,
+            newPassword,
+            confirmPassword
+        } = req.body;
+
+        if (
+            !oldPassword ||
+            !newPassword ||
+            !confirmPassword
+        ) {
+            return res.status(400).json({
+                message: 'Old password, new password and confirm password are required'
+            });
         }
-        const result = await authService.changePassword(userId,oldPassword,newPassword);
-        res.status(200).json({message:result.message})
-    }catch(err){
-        if(err.status){
-            return res.status(200).json({message:err.message});    
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                message: 'New password and confirm password do not match'
+            });
         }
+
+        const result =
+            await authService.changePassword(
+                userId,
+                oldPassword,
+                newPassword
+            );
+
+        res.status(200).json({
+            message: result.message
+        });
+
+    } catch (err) {
+
+        if (err.status) {
+            return res.status(err.status).json({
+                message: err.message
+            });
+        }
+
+        next(err);
     }
 };
 const forgotPassword = async (req, res, next) => {
@@ -132,10 +165,16 @@ const forgotPassword = async (req, res, next) => {
 
 const resetPasswordWithOtp = async (req, res, next) => {
     try {
-        const { email, otp, newPassword } = req.body;
+        const { email, otp, newPassword, confirmPassword } = req.body;
 
-        if (!email || !otp || !newPassword) {
-            return res.status(400).json({ message: 'Email, OTP, and new password are required' });
+        if (!email || !otp || !newPassword || !confirmPassword) {
+            return res.status(400).json({ message: 'Email, OTP, new password and confirm password are required' });
+        }
+        
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                message: 'New password and confirm password do not match'
+            });
         }
 
         const result = await authService.resetPasswordWithOtp(email, otp, newPassword);
