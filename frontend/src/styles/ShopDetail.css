@@ -1,0 +1,567 @@
+/* ─── TOKDAK Shop Detail ────────────────────────────────────────────────────── */
+
+.sd-page {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fbf9f8;
+  font-family: "Inter", sans-serif;
+}
+
+.sd-main {
+  flex: 1;
+  margin-left: 220px; /* Match sidebar width */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Top bar */
+.sd-topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background-color: #fbf9f8;
+  border-bottom: 1px solid #e2bfb0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.sd-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sd-back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  transition: background-color 0.15s ease;
+}
+
+.sd-back-btn:hover { 
+  background-color: rgba(160, 65, 0, 0.08); 
+}
+
+.sd-topbar-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1b1c1c;
+}
+
+.sd-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sd-notif-wrap { 
+  position: relative; 
+  cursor: pointer; 
+  font-size: 18px;
+}
+
+.sd-topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ff6b00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #e2bfb0;
+}
+
+/* Loading & Error States */
+.sd-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+}
+
+.sd-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ff6b00;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.sd-loading p {
+  color: #555555;
+  font-size: 14px;
+}
+
+.sd-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  color: #c62828;
+}
+
+.sd-btn-primary {
+  padding: 10px 24px;
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sd-btn-primary:hover {
+  background-color: #e85f00;
+}
+
+/* Content area */
+.sd-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+/* Info cards 2-col */
+.sd-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.sd-card {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  border: 1px solid #e2bfb0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card section heading */
+.sd-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sd-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.sd-card-id {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5f5e5e;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Badge */
+.sd-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Field rows */
+.sd-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sd-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5f5e5e;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 2px;
+}
+
+.sd-field-value {
+  font-size: 16px;
+  color: #1b1c1c;
+  margin: 0;
+}
+
+.sd-field-value.semibold { 
+  font-weight: 600; 
+}
+
+/* Owner photo row */
+.sd-owner-photo-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.sd-owner-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2bfb0;
+  background-color: #ff6b00;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sd-owner-initials {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+.sd-owner-meta { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+}
+
+/* Role badge */
+.sd-role-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ff6b00;
+  background-color: rgba(255, 219, 204, 0.2);
+  letter-spacing: 0.05em;
+}
+
+/* 2-col field row */
+.sd-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Status card */
+.sd-status-card {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  border: 1px solid #e2bfb0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sd-status-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sd-status-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #efeded;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.sd-status-label { 
+  font-size: 16px; 
+  color: #1b1c1c; 
+  margin: 0 0 2px; 
+  font-weight: 600;
+}
+
+.sd-status-desc  { 
+  font-size: 14px; 
+  color: #5f5e5e; 
+  margin: 0; 
+}
+
+.sd-status-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Status Badge - Active/Inactive states */
+.sd-active-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sd-active-badge.active {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.sd-active-badge.inactive {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.sd-active-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sd-active-badge.active .sd-active-dot {
+  background-color: #22c55e;
+}
+
+.sd-active-badge.inactive .sd-active-dot {
+  background-color: #ef4444;
+}
+
+.sd-toggle-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5f5e5e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Toggle Switch states */
+.sd-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
+}
+
+.sd-toggle.active {
+  background-color: #ff6b00;
+}
+
+.sd-toggle.inactive {
+  background-color: #9e9e9e;
+}
+
+.sd-toggle-thumb {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.sd-toggle.active .sd-toggle-thumb {
+  right: 3px;
+}
+
+.sd-toggle.inactive .sd-toggle-thumb {
+  left: 3px;
+}
+
+/* Stats row */
+.sd-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.sd-stat-card {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2bfb0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  padding: 17px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sd-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.sd-stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5f5e5e;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 2px;
+}
+
+.sd-stat-value {
+  font-size: 24px;
+  font-weight: 900;
+  color: #1b1c1c;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* Bottom actions */
+.sd-bottom-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid #e2bfb0;
+}
+
+.sd-btn-download {
+  padding: 13px 20px;
+  background: white;
+  border: 1px solid #8e7164;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  color: #1b1c1c;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.sd-btn-download:hover { 
+  border-color: #ff6b00; 
+  color: #ff6b00; 
+}
+
+.sd-btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  background: none;
+  border: 1px solid #ba1a1a;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  color: #ba1a1a;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.sd-btn-delete:hover { 
+  background-color: #ffebee; 
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sd-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sd-main {
+    margin-left: 60px;
+  }
+  
+  .sd-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sd-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sd-two-col {
+    grid-template-columns: 1fr;
+  }
+  
+  .sd-status-card {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .sd-status-right {
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+  }
+  
+  .sd-bottom-actions {
+    flex-direction: column;
+  }
+  
+  .sd-bottom-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Add to ShopDetail.css */
+.sd-toggling-text {
+  font-size: 11px;
+  color: #ff6b00;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+/* Make toggle clickable */
+.sd-toggle {
+  cursor: pointer;
+}
+
+.sd-toggle.inactive {
+  cursor: pointer;
+}

@@ -1,0 +1,274 @@
+/* ─── TOKDAK Login Page ────────────────────────────────────────────────────── */
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  font-family: "Inter", sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative blur blobs */
+.login-blob-orange {
+  position: absolute;
+  top: -6rem;
+  left: -4rem;
+  width: 32rem;
+  height: 26rem;
+  border-radius: 9999px;
+  background-color: #ff6b00;
+  filter: blur(60px);
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.login-blob-blue {
+  position: absolute;
+  bottom: -6rem;
+  right: -4rem;
+  width: 24rem;
+  height: 20rem;
+  border-radius: 9999px;
+  background-color: #059eff;
+  filter: blur(60px);
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* Card */
+.login-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 1rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.login-card-inner {
+  padding: 2.5rem 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Logo */
+.login-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.login-logo-text {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #1a1a1a;
+}
+
+.login-logo-text span {
+  color: #ff6b00;
+}
+
+.login-logo-subtitle {
+  font-size: 14px;
+  color: #555555;
+  line-height: 1.4;
+}
+
+/* Tabs */
+.login-tabs {
+  display: flex;
+  width: 100%;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.login-tab {
+  flex: 1;
+  padding-bottom: 0.75rem;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  color: #555555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+}
+
+.login-tab:hover {
+  color: #ff6b00;
+}
+
+.login-tab.active {
+  color: #ff6b00;
+}
+
+.login-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  background-color: #ff6b00;
+  border-radius: 9999px;
+}
+
+/* Form */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+
+.login-input {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2bfb0;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  color: #1a1a1a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: #9ca3af;
+}
+
+.login-input:focus {
+  border: 1.5px solid #ff6b00;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.login-input:hover:not(:focus) {
+  border-color: #d4956d;
+}
+
+/* Password wrapper */
+.login-password-wrap {
+  position: relative;
+}
+
+.login-password-wrap .login-input {
+  padding-right: 3rem;
+}
+
+.login-eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5f5e5e;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.login-eye-btn:hover {
+  color: #ff6b00;
+}
+
+/* Login button */
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 8px;
+  border: none;
+  background-color: #ff6b00;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-btn:hover {
+  background-color: #e85f00;
+}
+
+.login-btn:focus {
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.25);
+  outline: none;
+}
+
+.login-btn:active {
+  background-color: #cc5500;
+}
+
+/* Forgot password */
+.login-forgot {
+  display: flex;
+  justify-content: center;
+}
+
+.login-forgot a {
+  font-size: 14px;
+  color: #ff6b00;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.login-forgot a:hover {
+  color: #cc5500;
+  text-decoration: underline;
+}
+
+/* Footer */
+.login-footer {
+  position: relative;
+  z-index: 10;
+  margin-top: 2rem;
+  font-size: 13px;
+  color: #aaaaaa;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  .login-card-inner {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .login-logo-text {
+    font-size: 26px;
+  }
+}
