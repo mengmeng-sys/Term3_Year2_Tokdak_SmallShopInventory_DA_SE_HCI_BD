@@ -53,10 +53,18 @@ const resolveById = async (alertId) => {
     );
 };
 
+const countAllUnresolved = async () => {
+    const [[{ count }]] = await pool.query(
+        'SELECT COUNT(*) AS count FROM alerts WHERE is_resolved = FALSE'
+    );
+    return count;
+};
+
 module.exports = {
     createIfNotExists,
     resolveByProduct,
     findAllByShop,
     findById,
-    resolveById
+    resolveById,
+    countAllUnresolved
 };

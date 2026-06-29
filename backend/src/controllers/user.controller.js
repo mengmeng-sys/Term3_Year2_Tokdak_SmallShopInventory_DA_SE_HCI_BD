@@ -2,8 +2,12 @@ const authService = require('../services/user.service');
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await authService.getAllUsers();
-        res.json(users);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || '';
+        const status = req.query.status || '';
+        const result = await authService.getAllUsers(page, limit, search, status);
+        res.json({ data: result });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -21,33 +25,26 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const targetUserId = req.params.id; // The account being changed
+        const targetUserId = req.params.id;
         const updateData = req.body;
-        
-        // 1. Get the logged-in user's details from your auth middleware
-        const loggedInUser = req.user; 
+        const loggedInUser = req.user;
 
-        // 2. Enforce Security Rule: 
-        // If they are NOT an admin, they MUST match the target user ID
         if (loggedInUser.role !== 'admin' && String(loggedInUser.id) !== String(targetUserId)) {
             return res.status(403).json({ message: 'Forbidden: You can only update your own account' });
         }
 
-        // 3. Proceed if the check passes
         const result = await authService.updateUser(targetUserId, updateData);
         res.json({ message: 'User updated successfully' });
-        
     } catch (error) {
         res.status(404).json({ message: error.message });
-    }  
+    }
 }
 
 const deleteUser = async (req, res) => {
     try {
         const targetUserId = req.params.id;
-        const loggedInUser = req.user; 
+        const loggedInUser = req.user;
 
-        // Block if they are a client AND trying to delete someone else
         if (loggedInUser.role !== 'admin' && String(loggedInUser.id) !== String(targetUserId)) {
             return res.status(403).json({ message: 'Forbidden: You can only delete your own account' });
         }
@@ -59,11 +56,22 @@ const deleteUser = async (req, res) => {
     }
 }
 
+const toggleUserStatus = async (req, res) => {
+    try {
+        const targetUserId = req.params.id;
+        const { is_active } = req.body;
 
+        const result = await authService.toggleUserStatus(targetUserId, is_active);
+        res.json({ message: 'User status updated successfully' });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
 
 module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
-}
+    deleteUser,
+    toggleUserStatus
+};

@@ -1,13 +1,11 @@
 const authRepository = require('../repositories/user.repository');
 
-const getAllUsers = async () => {
-    const users = await authRepository.allUser();
-    return users;
+const getAllUsers = async (page = 1, limit = 10, search = '', status = '') => {
+    return await authRepository.allUser(page, limit, search, status);
 }
 
 const getUserById = async (userId) => {
     const user = await authRepository.findById(userId);
-
     if (!user) {
         throw new Error("User not found");
     }
@@ -30,9 +28,18 @@ const deleteUser = async (userId) => {
     return result;
 }
 
+const toggleUserStatus = async (userId, isActive) => {
+    const user = await authRepository.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return await authRepository.updateUserStatus(userId, isActive);
+}
+
 module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    toggleUserStatus
 };

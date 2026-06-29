@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import authService from '../../services/authService';
 import { Eye, EyeOff } from 'lucide-react';
+import TokdakLogo from '../../components/common/TokdakLogo';
 import '../../styles/Login.css';
 
 const Login = () => {
@@ -46,9 +47,7 @@ const Login = () => {
 
           {/* Logo */}
           <div className="login-logo">
-            <h1 className="login-logo-text">
-              TOK<span>DAK</span>
-            </h1>
+            <TokdakLogo height={40} />
             <p className="login-logo-subtitle">Small Shop Stock Inventory System</p>
           </div>
 

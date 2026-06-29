@@ -1,168 +1,146 @@
-// frontend/src/pages/admin/ShopDetail.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
 import shopService from '../../services/shopService';
 import userService from '../../services/userService';
-import productService from '../../services/productService';
-import categoryService from '../../services/categoryService';
-import stockService from '../../services/stockService';
 import { formatDate } from '../../utils/formatDate';
 import '../../styles/ShopDetail.css';
+
+function ProductsIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+  );
+}
+
+function CategoriesIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+    </svg>
+  );
+}
+
+function AlertsIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+  );
+}
+
+function BackArrow() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12 19 5 12 12 5"/>
+    </svg>
+  );
+}
 
 const ShopDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
+  const mountedRef = useRef(true);
   const [shop, setShop] = useState(null);
   const [owner, setOwner] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isToggling, setIsToggling] = useState(false);
   const [stats, setStats] = useState({
     totalProducts: 0,
     categoriesCount: 0,
-    transactionsCount: 0,
+    alertsCount: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isToggling, setIsToggling] = useState(false);
 
   useEffect(() => {
-    const fetchShopData = async () => {
+    if (!id) return;
+    mountedRef.current = true;
+
+    const load = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch shop details
-        const shopResponse = await shopService.getById(id);
-        const shopData = shopResponse?.data?.data || shopResponse?.data || {};
-        setShop(shopData);
+        const response = await shopService.getDetails(id);
+        if (!mountedRef.current) return;
+        const data = response?.data?.data || {};
+        setShop(data);
+        setStats({
+          totalProducts: data.total_products || 0,
+          categoriesCount: data.categories_count || 0,
+          alertsCount: data.alerts_count || 0,
+        });
 
-        // Fetch shop statistics
-        try {
-          // Get products for this shop
-          const productsResponse = await productService.getAll({ shop_id: id });
-          const products = productsResponse?.data?.data || productsResponse?.data || [];
-          
-          // Get categories for this shop
-          const categoriesResponse = await categoryService.getAll({ shop_id: id });
-          const categories = categoriesResponse?.data?.data || categoriesResponse?.data || [];
-          
-          // Get stock history for this shop
-          const historyResponse = await stockService.getShopHistory(id);
-          const history = historyResponse?.data?.data || historyResponse?.data || [];
-
-          setStats({
-            totalProducts: products.length || shopData.total_products || 0,
-            categoriesCount: categories.length || shopData.categories_count || 0,
-            transactionsCount: history.length || shopData.transactions_count || 0,
-          });
-        } catch (err) {
-          console.error('Error fetching shop stats:', err);
-          setStats({
-            totalProducts: shopData.total_products || 0,
-            categoriesCount: shopData.categories_count || 0,
-            transactionsCount: shopData.transactions_count || 0,
-          });
-        }
-
-        // Fetch owner details if user_id exists
-        if (shopData.user_id) {
+        if (data.user_id) {
           try {
-            const userResponse = await userService.getById(shopData.user_id);
-            const userData = userResponse?.data?.data || userResponse?.data || {};
+            const userRes = await userService.getById(data.user_id);
+            if (!mountedRef.current) return;
+            const userData = userRes?.data?.data || userRes?.data || {};
             setOwner(userData);
-          } catch (err) {
-            console.error('Error fetching owner:', err);
+          } catch {
+            if (!mountedRef.current) return;
             setOwner({
-              name: shopData.owner_name || 'N/A',
-              email: shopData.owner_email || 'N/A',
+              name: data.owner_name || 'N/A',
+              email: data.owner_email || 'N/A',
+              DOB: null,
+              gender: null,
             });
           }
-        } else {
-          setOwner({
-            name: shopData.owner_name || 'N/A',
-            email: shopData.owner_email || 'N/A',
-          });
         }
-
       } catch (err) {
-        console.error('Error fetching shop:', err);
+        if (!mountedRef.current) return;
+        console.error('Error loading shop details:', err);
         setError('Failed to load shop details');
-        // Fallback data
-        setShop({
-          shop_id: id || 'N/A',
-          shop_name: 'Unnamed Shop',
-          address: 'N/A',
-          phone: 'N/A',
-          created_at: new Date().toISOString(),
-          status: 'active',
-        });
-        setOwner({
-          name: 'N/A',
-          email: 'N/A',
-        });
-        setStats({
-          totalProducts: 0,
-          categoriesCount: 0,
-          transactionsCount: 0,
-        });
       } finally {
-        setLoading(false);
+        if (mountedRef.current) setLoading(false);
       }
     };
 
-    if (id) {
-      fetchShopData();
-    }
+    load();
+    return () => { mountedRef.current = false; };
   }, [id]);
 
-  // Handle toggle shop status
   const handleToggleStatus = async () => {
-    if (!shop) return;
-    
-    const newStatus = shop.status?.toLowerCase() === 'active' ? 'inactive' : 'active';
-    
-    if (window.confirm(`Are you sure you want to ${newStatus === 'active' ? 'activate' : 'deactivate'} this shop?`)) {
-      try {
-        setIsToggling(true);
-        
-        // Update shop status via API
-        const response = await shopService.update(id, { 
-          status: newStatus 
-        });
-        
-        // Update local state
-        const updatedShop = response?.data?.data || response?.data || {};
-        setShop({
-          ...shop,
-          status: updatedShop.status || newStatus,
-        });
-        
-        // Show success message
-        alert(`Shop ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully!`);
-        
-      } catch (err) {
-        console.error('Error updating shop status:', err);
-        alert('Failed to update shop status. Please try again.');
-      } finally {
-        setIsToggling(false);
-      }
+    if (!shop || !shop.user_id) return;
+
+    const willActivate = !shop.active;
+    const label = willActivate ? 'activate' : 'deactivate';
+
+    if (!window.confirm(`Are you sure you want to ${label} this shop?`)) return;
+
+    try {
+      setIsToggling(true);
+      await userService.toggleStatus(shop.user_id, willActivate);
+      setShop((prev) => ({ ...prev, active: willActivate }));
+    } catch (err) {
+      console.error('Error toggling shop status:', err);
+      alert('Failed to update shop status. Please try again.');
+    } finally {
+      setIsToggling(false);
     }
   };
 
-  const getStatusStyle = (status) => {
-    const statusMap = {
-      'active': { bg: '#e8f5e9', color: '#2e7d32', label: 'Active' },
-      'pending': { bg: '#fff3e0', color: '#ef6c00', label: 'Pending' },
-      'inactive': { bg: '#ffebee', color: '#c62828', label: 'Inactive' },
-    };
-    return statusMap[status?.toLowerCase()] || statusMap['active'];
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this shop? This action cannot be undone!')) return;
+    try {
+      await shopService.remove(id);
+      navigate('/admin/dashboard');
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to delete shop');
+    }
   };
 
-  const handleBack = () => {
-    navigate('/admin/dashboard');
-  };
+  const handleBack = () => navigate('/admin/dashboard');
+
+  const isActive = shop?.active;
 
   if (loading) {
     return (
@@ -174,7 +152,6 @@ const ShopDetail = () => {
               <span className="sd-topbar-title">Shop Details</span>
             </div>
             <div className="sd-topbar-right">
-              <div className="sd-notif-wrap">🔔</div>
               <div className="sd-topbar-avatar">
                 {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'A'}
               </div>
@@ -199,7 +176,6 @@ const ShopDetail = () => {
               <span className="sd-topbar-title">Shop Details</span>
             </div>
             <div className="sd-topbar-right">
-              <div className="sd-notif-wrap">🔔</div>
               <div className="sd-topbar-avatar">
                 {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'A'}
               </div>
@@ -207,34 +183,27 @@ const ShopDetail = () => {
           </div>
           <div className="sd-error">
             <p>{error}</p>
-            <button onClick={handleBack} className="sd-btn-primary">
-              ← Back to Dashboard
-            </button>
+            <button onClick={handleBack} className="sd-btn-primary">Back to Dashboard</button>
           </div>
         </div>
       </div>
     );
   }
 
-  const status = getStatusStyle(shop?.status);
-  const isActive = shop?.status?.toLowerCase() === 'active';
-
   return (
     <div className="sd-page">
       <AdminSidebar />
 
-      {/* Main Content */}
       <div className="sd-main">
-        {/* Top Bar */}
         <div className="sd-topbar">
           <div className="sd-topbar-left">
             <button className="sd-back-btn" onClick={handleBack}>
-              ←
+              <BackArrow />
+              <span>Back</span>
             </button>
             <span className="sd-topbar-title">Shop Details</span>
           </div>
           <div className="sd-topbar-right">
-            <div className="sd-notif-wrap">🔔</div>
             <div className="sd-topbar-avatar">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'A'}
             </div>
@@ -242,14 +211,10 @@ const ShopDetail = () => {
         </div>
 
         <div className="sd-content">
-          {/* Shop Info Grid */}
           <div className="sd-info-grid">
-            {/* Shop Info Card */}
             <div className="sd-card">
               <div className="sd-card-heading">
-                <div className="sd-card-title">
-                  <span>🏪</span> Shop Info
-                </div>
+                <div className="sd-card-title">Shop Info</div>
                 <span className="sd-card-id">ID: #{shop?.shop_id || 'N/A'}</span>
               </div>
               <div className="sd-fields">
@@ -271,31 +236,32 @@ const ShopDetail = () => {
                 </div>
                 <div>
                   <p className="sd-field-label">STATUS</p>
-                  <span className="sd-badge" style={{ backgroundColor: status.bg, color: status.color }}>
-                    {status.label}
+                  <span
+                    className="sd-badge"
+                    style={{
+                      backgroundColor: isActive ? '#e8f5e9' : '#ffebee',
+                      color: isActive ? '#2e7d32' : '#c62828',
+                    }}
+                  >
+                    {isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Owner Info Card */}
             <div className="sd-card">
               <div className="sd-card-heading">
-                <div className="sd-card-title">
-                  <span>👤</span> Owner Info
-                </div>
+                <div className="sd-card-title">Owner Info</div>
                 <span className="sd-role-badge">CLIENT</span>
               </div>
 
               <div className="sd-owner-photo-row">
                 <div className="sd-owner-photo">
-                  {owner?.name ? (
-                    <span className="sd-owner-initials">
-                      {owner.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                    </span>
-                  ) : (
-                    <span>👤</span>
-                  )}
+                  <span className="sd-owner-initials">
+                    {owner?.name
+                      ? owner.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                      : '?'}
+                  </span>
                 </div>
                 <div className="sd-owner-meta">
                   <div>
@@ -322,13 +288,12 @@ const ShopDetail = () => {
             </div>
           </div>
 
-          {/* Operational Status */}
           <div className="sd-status-card">
             <div className="sd-status-left">
               <div className="sd-status-icon">📍</div>
               <div>
                 <p className="sd-status-label">Operational Status</p>
-                <p className="sd-status-desc">Manage the shop's visibility and accessibility in the platform.</p>
+                <p className="sd-status-desc">Manage the shop owner account status.</p>
               </div>
             </div>
             <div className="sd-status-right">
@@ -338,55 +303,53 @@ const ShopDetail = () => {
               </span>
               <div>
                 <span className="sd-toggle-label">TOGGLE STATUS</span>
-                <div 
+                <div
                   className={`sd-toggle ${isActive ? 'active' : 'inactive'}`}
                   onClick={handleToggleStatus}
                   style={{ cursor: isToggling ? 'not-allowed' : 'pointer', opacity: isToggling ? 0.6 : 1 }}
                 >
                   <div className="sd-toggle-thumb" />
                 </div>
-                {isToggling && <span className="sd-toggling-text">Updating...</span>}
               </div>
             </div>
           </div>
 
-          {/* Stats */}
           <div className="sd-stats-grid">
-            {[
-              { label: "TOTAL PRODUCTS", value: stats.totalProducts, icon: '📦' },
-              { label: "CATEGORIES", value: stats.categoriesCount, icon: '📂' },
-              { label: "TRANSACTIONS", value: stats.transactionsCount, icon: '🔄' },
-            ].map((stat, i) => (
-              <div key={i} className="sd-stat-card">
-                <div className="sd-stat-icon" style={{ 
-                  backgroundColor: i === 0 ? 'rgba(255,107,0,0.1)' : 
-                                  i === 1 ? 'rgba(33,150,243,0.1)' : 
-                                  'rgba(76,175,80,0.1)' 
-                }}>
-                  {stat.icon}
-                </div>
-                <div>
-                  <p className="sd-stat-label">{stat.label}</p>
-                  <p className="sd-stat-value">{stat.value}</p>
-                </div>
+            <div className="sd-stat-card">
+              <div className="sd-stat-icon-box" style={{ backgroundColor: 'rgba(255,107,0,0.12)', color: '#e85f00' }}>
+                <ProductsIcon />
               </div>
-            ))}
+              <div className="sd-stat-info">
+                <p className="sd-stat-label">TOTAL PRODUCTS</p>
+                <p className="sd-stat-value">{stats.totalProducts}</p>
+              </div>
+            </div>
+            <div className="sd-stat-card">
+              <div className="sd-stat-icon-box" style={{ backgroundColor: 'rgba(33,150,243,0.12)', color: '#1565c0' }}>
+                <CategoriesIcon />
+              </div>
+              <div className="sd-stat-info">
+                <p className="sd-stat-label">CATEGORIES</p>
+                <p className="sd-stat-value">{stats.categoriesCount}</p>
+              </div>
+            </div>
+            <div className="sd-stat-card">
+              <div className="sd-stat-icon-box" style={{ backgroundColor: 'rgba(239,83,80,0.12)', color: '#d32f2f' }}>
+                <AlertsIcon />
+              </div>
+              <div className="sd-stat-info">
+                <p className="sd-stat-label">UNRESOLVED ALERTS</p>
+                <p className="sd-stat-value">{stats.alertsCount}</p>
+              </div>
+            </div>
           </div>
 
-          {/* Bottom Actions */}
           <div className="sd-bottom-actions">
             <button className="sd-btn-download" onClick={() => alert('Download report feature coming soon!')}>
-              📥 Download Report
+              Download Report
             </button>
-            <button 
-              className="sd-btn-delete"
-              onClick={() => {
-                if (window.confirm('Are you sure you want to delete this shop? This action cannot be undone!')) {
-                  alert('Delete shop feature coming soon!');
-                }
-              }}
-            >
-              🗑️ Delete Account
+            <button className="sd-btn-delete" onClick={handleDelete}>
+              Delete Account
             </button>
           </div>
         </div>

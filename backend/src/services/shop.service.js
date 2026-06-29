@@ -1,7 +1,8 @@
 const shoprepository = require('../repositories/shop.repository');
+const alertRepository = require('../repositories/alert.repository');
 
-const getAllShops = async () => {
-    return await shoprepository.findAllShops();
+const getAllShops = async (page = 1, limit = 10, search = '') => {
+    return await shoprepository.findAllShops(page, limit, search);
 }
 
 const getShopById = async (shopId) => {
@@ -10,6 +11,15 @@ const getShopById = async (shopId) => {
         throw new Error('Shop not found');
     }
     return shop;
+}
+
+const getShopDetails = async (shopId) => {
+    const shop = await shoprepository.findShopById(shopId);
+    if (!shop) {
+        throw new Error('Shop not found');
+    }
+    const stats = await shoprepository.getShopStats(shopId);
+    return { ...shop, ...stats };
 }
 
 const updateShop = async (shopId, updateData) => {
@@ -30,9 +40,17 @@ const deleteShop = async (shopId) => {
     return await shoprepository.deleteShop(shopId);
 }
 
+const getStats = async () => {
+    const shopStats = await shoprepository.getStats();
+    const unresolvedAlerts = await alertRepository.countAllUnresolved();
+    return { ...shopStats, unresolved_alerts: unresolvedAlerts };
+};
+
 module.exports = {
     getAllShops,
     getShopById,
+    getShopDetails,
+    getStats,
     updateShop,
     deleteShop
 };

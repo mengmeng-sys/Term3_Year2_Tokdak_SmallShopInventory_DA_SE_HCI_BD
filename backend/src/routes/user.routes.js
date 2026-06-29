@@ -9,6 +9,7 @@ router.get('/test',(req,res)=>{
 router.get('/', authMiddleware, roleMiddleware('admin'), userController.getAllUsers);
 router.get('/:id', authMiddleware, userController.getUserById);
 router.put('/:id', authMiddleware, userController.updateUser);
+router.patch('/:id/status', authMiddleware, roleMiddleware('admin'), userController.toggleUserStatus);
 router.delete('/:id', authMiddleware, roleMiddleware('admin'), userController.deleteUser);
 
 module.exports = router;

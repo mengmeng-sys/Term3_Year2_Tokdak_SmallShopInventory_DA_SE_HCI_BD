@@ -4,3 +4,4 @@ backend/database/migrations/userPrivileges.sql
 .DS_Store
 dist/
 build/
+AGENTS.md

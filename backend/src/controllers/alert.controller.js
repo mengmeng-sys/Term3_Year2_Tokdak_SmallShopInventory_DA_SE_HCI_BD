@@ -19,7 +19,17 @@ const resolveAlert = async (req, res, next) => {
       }
 };
 
+const getAdminAlertCount = async (req, res, next) => {
+    try {
+        const count = await alertService.getAdminAlertCount();
+        res.status(200).json({ data: { count } });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
        getActiveAlerts,
-       resolveAlert
+       resolveAlert,
+       getAdminAlertCount
 }

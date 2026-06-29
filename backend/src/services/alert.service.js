@@ -13,7 +13,12 @@ const resolveAlert = async (alertId, shopId) => {
      return {message:'Alert resolved successfully'};
 };
 
+const getAdminAlertCount = async () => {
+    return await alertRepository.countAllUnresolved();
+};
+
 module.exports ={
            getActiveAlerts,
-           resolveAlert
+           resolveAlert,
+           getAdminAlertCount
           }

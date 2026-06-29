@@ -45,7 +45,8 @@ const getAdminStats = async () =>{
     const [[activeClients]] = await pool.query("SELECT COUNT(*) AS count FROM users WHERE role = 'client' AND is_active = TRUE");
 
     const [recentShops] = await pool.query(
-        `SELECT s.shop_id, s.shop_name, s.created_at,s.phone,u.name AS owner_name
+        `SELECT s.shop_id, s.shop_name, s.created_at, s.phone,
+                u.name AS owner_name, u.is_active AS active
          FROM shops s JOIN users u ON s.user_id = u.user_id
          ORDER BY s.created_at DESC LIMIT 5`
     );

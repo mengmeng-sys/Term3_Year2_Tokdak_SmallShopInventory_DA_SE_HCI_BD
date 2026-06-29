@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle2, Mail, KeyRound } from 'lucide-react';
 import authService from '../../services/authService';
+import TokdakLogo from '../../components/common/TokdakLogo';
 import '../../styles/ForgotPassword.css';
 
 const ForgotPasswordFlow = () => {
@@ -142,7 +143,7 @@ const ForgotPasswordFlow = () => {
         <div className="fp-card">
           <div className="fp-card-inner">
             <div className="fp-logo">
-              <div className="fp-logo-text">TOK<span>DAK</span></div>
+              <TokdakLogo height={40} />
               <div className="fp-logo-sub">Small Shop Stock Inventory System</div>
             </div>
 

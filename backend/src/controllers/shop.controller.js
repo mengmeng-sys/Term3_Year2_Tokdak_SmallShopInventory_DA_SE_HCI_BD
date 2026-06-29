@@ -2,8 +2,11 @@ const shopService = require("../services/shop.service")
 
 const getAllShops = async (req, res) => {
     try {
-        const shops = await shopService.getAllShops();
-        res.json(shops);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || '';
+        const result = await shopService.getAllShops(page, limit, search);
+        res.json({ data: result });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -14,6 +17,16 @@ const getShopById = async (req, res) => {
         const shopId = req.params.id;
         const shop = await shopService.getShopById(shopId);
         res.json(shop);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
+const getShopDetails = async (req, res) => {
+    try {
+        const shopId = req.params.id;
+        const details = await shopService.getShopDetails(shopId);
+        res.json({ data: details });
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -71,9 +84,20 @@ const deleteShop = async (req, res) => {
 
 
 
+const getShopListStats = async (req, res) => {
+    try {
+        const stats = await shopService.getStats();
+        res.json({ data: stats });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     getAllShops,
     getShopById,
+    getShopDetails,
+    getShopListStats,
     updateShop,
     deleteShop
 }
