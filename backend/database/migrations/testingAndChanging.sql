@@ -7,6 +7,7 @@ use tokdak;
 select * from shops;
 
 select * from users;
+
 desc stock_transactions;
 
 select * from products where shop_id=1;

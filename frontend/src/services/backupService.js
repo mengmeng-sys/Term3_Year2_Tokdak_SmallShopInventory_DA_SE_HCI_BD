@@ -1,4 +1,9 @@
 import api from './axiosInstance';
-const getAll = () => api.get('/backups');
-const create = () => api.post('/backups');
-export default { getAll, create };
+
+const getAll = (page = 1, limit = 10) => api.get(`/backups?page=${page}&limit=${limit}`);
+const getStats = () => api.get('/backups/stats');
+const getById = (id) => api.get(`/backups/${id}`);
+const create = (data) => api.post('/backups', data);
+const remove = (id) => api.delete(`/backups/${id}`);
+
+export default { getAll, getStats, getById, create, remove };

@@ -2,9 +2,21 @@ const backupService = require('../services/backup.service');
 
 const getAllBackups = async (req, res, next) => {
     try {
-        const backups = await backupService.getAllBackups();
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const result = await backupService.getAllBackups(page, limit);
 
-        res.status(200).json(backups);
+        res.status(200).json({ data: result });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getBackupStats = async (req, res, next) => {
+    try {
+        const stats = await backupService.getBackupStats();
+
+        res.status(200).json({ data: stats });
     } catch (error) {
         next(error);
     }
@@ -65,6 +77,7 @@ const deleteBackup = async (req, res, next) => {
 
 module.exports = {
     getAllBackups,
+    getBackupStats,
     getBackupById,
     createBackup,
     deleteBackup

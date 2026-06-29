@@ -52,6 +52,9 @@ const deleteUser = async (req, res) => {
         const result = await authService.deleteUser(targetUserId);
         res.json({ message: 'User deleted successfully' });
     } catch (error) {
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            return res.status(409).json({ message: 'Cannot delete user: user has related stock transactions or backups. Please remove them first.' });
+        }
         res.status(404).json({ message: error.message });
     }
 }

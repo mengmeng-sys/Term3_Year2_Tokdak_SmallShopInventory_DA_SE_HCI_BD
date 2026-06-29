@@ -1,7 +1,11 @@
 const backupRepository = require('../repositories/backup.repository');
 
-const getAllBackups = async () => {
-    return await backupRepository.getAllBackups();
+const getAllBackups = async (page = 1, limit = 10) => {
+    return await backupRepository.getAllBackups(page, limit);
+};
+
+const getBackupStats = async () => {
+    return await backupRepository.getBackupStats();
 };
 
 const getBackupById = async (id) => {
@@ -18,6 +22,7 @@ const deleteBackup = async (id) => {
 
 module.exports = {
     getAllBackups,
+    getBackupStats,
     getBackupById,
     createBackup,
     deleteBackup

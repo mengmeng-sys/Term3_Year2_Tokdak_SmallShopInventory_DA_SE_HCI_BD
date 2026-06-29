@@ -91,6 +91,8 @@ const ShopsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
+  const [showNotif, setShowNotif] = useState(false);
+  const [showLang, setShowLang] = useState(false);
   const debounceRef = useRef(null);
 
   const fetchShops = async (page, term = '') => {
@@ -200,14 +202,31 @@ const ShopsList = () => {
             <span className="shops-total-badge">{stats.total} Total</span>
           </div>
           <div className="shops-topbar-actions">
-            <button className="shops-notif-btn">
-              <NotifIcon />
-              <span className="shops-notif-dot" />
-            </button>
-            <button className="shops-lang-btn">
-              <GlobeIcon />
-              <ChevronDownIcon />
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button className="shops-notif-btn" onClick={() => { setShowNotif(v => !v); setShowLang(false); }}>
+                <NotifIcon />
+                <span className="shops-notif-dot" />
+              </button>
+              {showNotif && (
+                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
+                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
+                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
+                </div>
+              )}
+            </div>
+            <div style={{ position: 'relative' }}>
+              <button className="shops-lang-btn" onClick={() => { setShowLang(v => !v); setShowNotif(false); }}>
+                <GlobeIcon />
+                <ChevronDownIcon />
+              </button>
+              {showLang && (
+                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 160, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 8 }}>
+                  {['English', 'Khmer', 'Chinese'].map(lang => (
+                    <button key={lang} onClick={() => { setShowLang(false); alert(`Language switching to ${lang} coming soon`); }} style={{ display: 'block', width: '100%', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 13, borderRadius: 4 }}>{lang}</button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

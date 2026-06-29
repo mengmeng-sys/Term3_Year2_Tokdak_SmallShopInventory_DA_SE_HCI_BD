@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
 import shopService from '../../services/shopService';
 import userService from '../../services/userService';
+import reportService from '../../services/reportService';
 import { formatDate } from '../../utils/formatDate';
 import '../../styles/ShopDetail.css';
 
@@ -59,6 +60,8 @@ const ShopDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isToggling, setIsToggling] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -138,7 +141,36 @@ const ShopDetail = () => {
     }
   };
 
-  const handleBack = () => navigate('/admin/dashboard');
+  const handleBack = () => navigate('/admin/shops');
+
+  const handleDownloadReport = async () => {
+    setDownloading(true);
+    try {
+      const res = await reportService.getSummary();
+      const data = res?.data?.data || res?.data || {};
+      const reportData = {
+        shop: { name: shop?.shop_name, id: shop?.shop_id, address: shop?.address, phone: shop?.phone },
+        owner: { name: owner?.name, email: owner?.email },
+        stats,
+        generatedAt: new Date().toISOString(),
+        summary: data,
+      };
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `shop_report_${shop?.shop_id || 'export'}_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error generating report:', err);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const isActive = shop?.active;
 
@@ -204,6 +236,20 @@ const ShopDetail = () => {
             <span className="sd-topbar-title">Shop Details</span>
           </div>
           <div className="sd-topbar-right">
+            <div style={{ position: 'relative' }}>
+              <button className="sd-notif-btn" onClick={() => setShowNotif(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, position: 'relative' }}>
+                <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+                  <path d="M16 17H0v-2l2-2V8c0-3.31 2.69-6 6-6s6 2.69 6 6v5l2 2v2zM8 20a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#5f5e5e"/>
+                </svg>
+                <span style={{ position: 'absolute', top: 2, right: 2, width: 8, height: 8, borderRadius: '50%', backgroundColor: '#ff6b00' }} />
+              </button>
+              {showNotif && (
+                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
+                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
+                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
+                </div>
+              )}
+            </div>
             <div className="sd-topbar-avatar">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'A'}
             </div>
@@ -252,7 +298,7 @@ const ShopDetail = () => {
             <div className="sd-card">
               <div className="sd-card-heading">
                 <div className="sd-card-title">Owner Info</div>
-                <span className="sd-role-badge">CLIENT</span>
+                <span className="sd-role-badge">{owner?.role ? owner.role.toUpperCase() : 'CLIENT'}</span>
               </div>
 
               <div className="sd-owner-photo-row">
@@ -345,8 +391,8 @@ const ShopDetail = () => {
           </div>
 
           <div className="sd-bottom-actions">
-            <button className="sd-btn-download" onClick={() => alert('Download report feature coming soon!')}>
-              Download Report
+            <button className="sd-btn-download" onClick={handleDownloadReport} disabled={downloading}>
+              {downloading ? 'Downloading...' : 'Download Report'}
             </button>
             <button className="sd-btn-delete" onClick={handleDelete}>
               Delete Account

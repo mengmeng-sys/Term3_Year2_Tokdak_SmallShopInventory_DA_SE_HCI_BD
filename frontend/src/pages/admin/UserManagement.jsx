@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
 import userService from '../../services/userService';
@@ -59,6 +60,7 @@ function getUserInitials(user) {
 
 const UserManagement = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
@@ -67,6 +69,7 @@ const UserManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [showNotif, setShowNotif] = useState(false);
   const debounceRef = useRef(null);
 
   const fetchUsers = useCallback(async (page, term, status) => {
@@ -127,12 +130,15 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await userService.remove(userId);
       setUsers(prev => prev.filter(u => u.user_id !== userId));
       setTotal(prev => prev - 1);
+      alert('User deleted successfully');
     } catch (err) {
-      console.error('Error deleting user:', err);
+      const msg = err?.response?.data?.message || 'Failed to delete user';
+      alert(msg);
     }
   };
 
@@ -162,10 +168,18 @@ const UserManagement = () => {
         <div className="um-topbar">
           <span className="um-topbar-title">User Management</span>
           <div className="um-topbar-right">
-            <button className="um-notif-btn">
-              <NotifIcon />
-              <span className="um-notif-dot" />
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button className="um-notif-btn" onClick={() => setShowNotif(v => !v)}>
+                <NotifIcon />
+                <span className="um-notif-dot" />
+              </button>
+              {showNotif && (
+                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
+                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
+                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
+                </div>
+              )}
+            </div>
             <div className="um-admin-badge">{user ? getUserInitials(user) : 'A'}</div>
           </div>
         </div>
@@ -191,7 +205,7 @@ const UserManagement = () => {
                 </select>
                 <span className="um-filter-chevron"><ChevronDownIcon /></span>
               </div>
-              <button className="um-btn-new-user" onClick={() => {}}>
+              <button className="um-btn-new-user" onClick={() => navigate('/admin/shops/add')}>
                 <PlusIcon />
                 New User
               </button>
