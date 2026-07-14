@@ -89,6 +89,7 @@
 
 /* Tabs */
 .login-tabs {
+  position: relative;
   display: flex;
   width: 100%;
   margin-bottom: 2rem;
@@ -106,7 +107,8 @@
   border: none;
   cursor: pointer;
   position: relative;
-  transition: color 0.15s ease;
+  z-index: 1;
+  transition: color 0.2s ease;
 }
 
 .login-tab:hover {
@@ -117,15 +119,16 @@
   color: #ff6b00;
 }
 
-.login-tab.active::after {
-  content: "";
+.login-tab-indicator {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: 50%;
   height: 2.5px;
   background-color: #ff6b00;
   border-radius: 9999px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 /* Form */

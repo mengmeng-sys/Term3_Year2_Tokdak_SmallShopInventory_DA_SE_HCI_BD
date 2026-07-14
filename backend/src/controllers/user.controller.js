@@ -71,10 +71,32 @@ const toggleUserStatus = async (req, res) => {
     }
 }
 
+const uploadAvatar = async (req, res) => {
+    try {
+        const targetUserId = req.params.id;
+        const loggedInUser = req.user;
+
+        if (String(loggedInUser.id) !== String(targetUserId)) {
+            return res.status(403).json({ message: 'Forbidden: You can only update your own avatar' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'No image file provided' });
+        }
+
+        const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+        const result = await authService.updateAvatar(targetUserId, avatarUrl);
+        res.json({ message: 'Avatar updated successfully', avatar_url: avatarUrl });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
     deleteUser,
-    toggleUserStatus
+    toggleUserStatus,
+    uploadAvatar
 };

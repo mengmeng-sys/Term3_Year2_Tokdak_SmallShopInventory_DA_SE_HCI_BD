@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/axiosInstance';
 
 const AuthContext = createContext();
@@ -33,8 +33,37 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (updates) => {
+    setUser(prev => {
+      const next = { ...prev, ...updates };
+      localStorage.setItem('tokdak_user', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (!token || !user?.user_id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.get('/auth/me');
+        const data = res.data?.data || res.data || {};
+        if (!cancelled && data.avatar_url) {
+          updateUser({ avatar_url: data.avatar_url });
+        }
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, [token, user?.user_id]);
+
+  const getAvatarUrl = () => {
+    if (!user?.avatar_url) return null;
+    const base = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
+    return `${base}${user.avatar_url}`;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser, getAvatarUrl }}>
       {children}
     </AuthContext.Provider>
   );

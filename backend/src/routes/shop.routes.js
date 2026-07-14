@@ -8,6 +8,7 @@ router.get('/test',(req,res)=>{
 })
 router.get('/', authMiddleware, roleMiddleware('admin'), shopController.getAllShops);
 router.get('/stats', authMiddleware, roleMiddleware('admin'), shopController.getShopListStats);
+router.get('/user/:userId', authMiddleware, shopController.getShopByUserId);
 router.get('/:id', authMiddleware, shopController.getShopById);
 router.get('/:id/details', authMiddleware, roleMiddleware('admin'), shopController.getShopDetails);
 router.put('/:id', authMiddleware, shopController.updateShop);

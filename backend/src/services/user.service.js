@@ -36,10 +36,19 @@ const toggleUserStatus = async (userId, isActive) => {
     return await authRepository.updateUserStatus(userId, isActive);
 }
 
+const updateAvatar = async (userId, avatarUrl) => {
+    const user = await authRepository.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return await authRepository.updateAvatar(userId, avatarUrl);
+}
+
 module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
     deleteUser,
-    toggleUserStatus
+    toggleUserStatus,
+    updateAvatar
 };

@@ -122,6 +122,11 @@
   animation: spin 0.8s linear infinite;
 }
 
+@keyframes sdFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
@@ -167,6 +172,7 @@
   box-sizing: border-box;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  animation: sdFadeIn 0.35s ease;
 }
 
 /* Info cards 2-col */

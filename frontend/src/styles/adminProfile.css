@@ -26,6 +26,11 @@
   animation: ap-spin 0.7s linear infinite;
 }
 
+@keyframes apFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes ap-spin {
   to { transform: rotate(360deg); }
 }
@@ -101,6 +106,7 @@
   padding: 32px 24px;
   width: 100%;
   box-sizing: border-box;
+  animation: apFadeIn 0.35s ease;
 }
 
 .ap-grid {
@@ -140,6 +146,25 @@
   color: white;
   box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
   outline: 1px solid #e2bfb0;
+}
+
+.ap-avatar-img {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  outline: 1px solid #e2bfb0;
+}
+
+.ap-avatar-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff6b00;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: ap-spin 0.8s linear infinite;
 }
 
 .ap-avatar-edit {

@@ -6,7 +6,7 @@ where email ="admin@tokdak.com";
 use tokdak;
 select * from shops;
 
-select * from users;
+select * from users where email = 'sundabid13@gmail.com';
 
 desc stock_transactions;
 

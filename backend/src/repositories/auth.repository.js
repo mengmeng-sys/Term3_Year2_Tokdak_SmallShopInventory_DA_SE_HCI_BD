@@ -2,7 +2,7 @@ const pool = require('../config/db')
 
 const findByEmail = async (email) =>{
  const [rows] = await pool.query(
-  'select * from users where email = ?',
+  'select user_id, name, email, password, role, DOB, gender, created_at, updated_at, reset_otp, reset_otp_expires, is_active from users where email = ?',
   [email]);
 
  return rows[0];
@@ -53,7 +53,7 @@ const createUserWithShop = async (userData, shopData) => {
 
 const findById = async (userId) => {
     const [rows] = await pool.query(
-        'select user_id, name, email, role, DOB, gender, created_at from users where user_id = ?',
+        'select user_id, name, email, role, DOB, gender, avatar_url, created_at from users where user_id = ?',
         [userId]
     );
     return rows[0];
@@ -134,7 +134,7 @@ const saveResetOtp= async (email,otp,expiresAt) =>{
 };
 const findByEmailWithOtp = async (email) => {
     const [rows] = await pool.query(
-        'select * from users where email = ?',
+        'select user_id, name, email, password, role, DOB, gender, created_at, updated_at, reset_otp, reset_otp_expires, is_active from users where email = ?',
         [email]
     )
     return rows[0];

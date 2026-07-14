@@ -38,7 +38,7 @@ const allUser = async (page = 1, limit = 10, search = '', status = '') => {
 
 const findById = async (userId) => {
     const [rows] = await pool.query(
-        'SELECT user_id, name, email, DOB, gender, role, is_active, created_at from users WHERE user_id = ?',
+        'SELECT user_id, name, email, DOB, gender, avatar_url, role, is_active, created_at from users WHERE user_id = ?',
         [userId]
     )
     return rows[0]
@@ -71,10 +71,19 @@ const updateUserStatus = async (userId, isActive) => {
     return result;
 }
 
+const updateAvatar = async (userId, avatarUrl) => {
+    const [result] = await pool.query(
+        'UPDATE users SET avatar_url = ? WHERE user_id = ?',
+        [avatarUrl, userId]
+    );
+    return result;
+}
+
 module.exports = {
     allUser,
     findById,
     updateUser,
     removeUser,
-    updateUserStatus
+    updateUserStatus,
+    updateAvatar
 };

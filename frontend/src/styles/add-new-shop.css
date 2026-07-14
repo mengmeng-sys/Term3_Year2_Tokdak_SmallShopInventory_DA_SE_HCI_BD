@@ -126,6 +126,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: ansFadeIn 0.35s ease;
 }
 
 /* Form card */
@@ -412,6 +413,11 @@
   border-top-color: white;
   border-radius: 50%;
   animation: ans-spin 0.7s linear infinite;
+}
+
+@keyframes ansFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes ans-spin {

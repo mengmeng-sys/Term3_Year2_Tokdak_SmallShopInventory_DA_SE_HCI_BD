@@ -79,6 +79,8 @@ const AdminProfile = () => {
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const [saveMessage, setSaveMessage] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -92,6 +94,10 @@ const AdminProfile = () => {
         setDob(data.DOB || '');
         setGender(data.gender || 'Male');
         setJoinedAt(data.created_at || '');
+        if (data.avatar_url) {
+          const base = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
+          setAvatarUrl(`${base}${data.avatar_url}`);
+        }
       } catch {
         if (mountedRef.current) {
           setName(user?.name || '');
@@ -125,6 +131,36 @@ const AdminProfile = () => {
       setSaveMessage(err.response?.data?.message || 'Failed to update profile');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+      alert('Only image files are allowed (JPEG, PNG, GIF, WebP)');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be 5MB or less');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await userService.uploadAvatar(user?.user_id, formData);
+      const base = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
+      setAvatarUrl(`${base}${res.data.avatar_url}`);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -191,7 +227,11 @@ const AdminProfile = () => {
               )}
             </div>
             <div className="ap-topbar-avatar">
-              {getUserInitials()}
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                getUserInitials()
+              )}
             </div>
           </div>
         </div>
@@ -200,14 +240,15 @@ const AdminProfile = () => {
           <div className="ap-grid">
             <div className="ap-profile-card">
               <div className="ap-avatar-wrap">
-                <div className="ap-avatar-circle">{getUserInitials()}</div>
-                <button className="ap-avatar-edit" onClick={() => fileInputRef.current?.click()}>
-                  <CameraIcon />
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="ap-avatar-img" />
+                ) : (
+                  <div className="ap-avatar-circle">{getUserInitials()}</div>
+                )}
+                <button className="ap-avatar-edit" onClick={() => fileInputRef.current?.click()} disabled={uploadingAvatar}>
+                  {uploadingAvatar ? <div className="ap-avatar-spinner" /> : <CameraIcon />}
                 </button>
-                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) alert('Avatar upload coming soon');
-                }} />
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" style={{ display: 'none' }} onChange={handleAvatarUpload} />
               </div>
 
               <div className="ap-profile-name">{name || 'Admin User'}</div>

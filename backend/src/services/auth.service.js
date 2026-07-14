@@ -20,13 +20,14 @@ const login = async ( email , password) =>{
   {expiresIn:process.env.JWT_EXPIRES || '7d'}
  );
 
- return {
+  return {
   token,
   user: {
     user_id: user.user_id,
     name: user.name,
     email: user.email,
-    role: user.role
+    role: user.role,
+    avatar_url: user.avatar_url || null
   }
  }
 
@@ -183,7 +184,7 @@ const changePassword = async (userId, oldPassword, newPassword) => {
     // 3. Verify the old password matches
     const isMatch = await bcrypt.compare(oldPassword, fullUser.password);
     if (!isMatch) {
-        throw { status: 401, message: 'Current password is incorrect' };
+        throw { status: 400, message: 'Current password is incorrect' };
     }
     // 4. make sure it is not the same old password.
     if (oldPassword === newPassword) {

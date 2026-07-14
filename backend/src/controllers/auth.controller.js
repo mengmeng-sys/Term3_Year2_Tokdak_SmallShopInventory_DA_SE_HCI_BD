@@ -10,11 +10,10 @@ const login = async (req, res, next) => {
         res.status(200).json({message:'Login successful', data : result});
 
     } catch(err) {
-
         if(err.status){
             return res.status(err.status).json({message: err.message});
-            next(err);
         }
+        next(err);
     }
 };
 

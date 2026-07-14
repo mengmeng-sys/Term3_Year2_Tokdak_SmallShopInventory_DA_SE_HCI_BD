@@ -22,6 +22,16 @@ const getShopById = async (req, res) => {
     }
 }
 
+const getShopByUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const shop = await shopService.getShopByUserId(userId);
+        res.json(shop);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 const getShopDetails = async (req, res) => {
     try {
         const shopId = req.params.id;
@@ -96,6 +106,7 @@ const getShopListStats = async (req, res) => {
 module.exports = {
     getAllShops,
     getShopById,
+    getShopByUserId,
     getShopDetails,
     getShopListStats,
     updateShop,

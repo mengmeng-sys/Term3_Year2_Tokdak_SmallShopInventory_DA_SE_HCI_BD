@@ -13,6 +13,14 @@ const getShopById = async (shopId) => {
     return shop;
 }
 
+const getShopByUserId = async (userId) => {
+    const shop = await shoprepository.findByUserId(userId);
+    if (!shop) {
+        throw new Error('Shop not found for this user');
+    }
+    return shop;
+}
+
 const getShopDetails = async (shopId) => {
     const shop = await shoprepository.findShopById(shopId);
     if (!shop) {
@@ -49,6 +57,7 @@ const getStats = async () => {
 module.exports = {
     getAllShops,
     getShopById,
+    getShopByUserId,
     getShopDetails,
     getStats,
     updateShop,

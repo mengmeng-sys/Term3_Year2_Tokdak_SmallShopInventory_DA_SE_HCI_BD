@@ -25,13 +25,19 @@ const Login = () => {
     try {
       const user = await login(email, password);
 
+      if (user?.role !== activeTab) {
+        throw new Error('role_mismatch');
+      }
+
       if (user?.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/client/dashboard');
       }
     } catch (err) {
-      setError('Invalid email or password');
+      setError(err.message === 'role_mismatch'
+        ? `This account is not a${activeTab === 'admin' ? 'n' : ''} ${activeTab} user`
+        : 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -53,18 +59,22 @@ const Login = () => {
 
           {/* Tabs */}
           <div className="login-tabs">
-            <button 
+            <button
               className={`login-tab ${activeTab === 'client' ? 'active' : ''}`}
               onClick={() => setActiveTab('client')}
             >
               Client Login
             </button>
-            <button 
+            <button
               className={`login-tab ${activeTab === 'admin' ? 'active' : ''}`}
               onClick={() => setActiveTab('admin')}
             >
               Admin Login
             </button>
+            <div
+              className="login-tab-indicator"
+              style={{ transform: `translateX(${activeTab === 'client' ? '0%' : '100%'})` }}
+            />
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
