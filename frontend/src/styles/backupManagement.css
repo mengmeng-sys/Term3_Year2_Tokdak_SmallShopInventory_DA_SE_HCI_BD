@@ -70,25 +70,6 @@
   gap: 16px;
 }
 
-.bm-notif-btn {
-  position: relative;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.bm-notif-dot {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #ff6b00;
-  border: 2px solid #fbf9f8;
-}
-
 .bm-settings-btn {
   width: 32px;
   height: 32px;

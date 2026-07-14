@@ -55,3 +55,5 @@ select * from `userTemp`;
 TRUNCATE table `userTemp`;
 drop table `userTemp`;
 select * from alerts ;
+select * from backups;
+show tables;

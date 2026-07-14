@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 import shopService from '../../services/shopService';
 import userService from '../../services/userService';
 import reportService from '../../services/reportService';
@@ -60,7 +61,6 @@ const ShopDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isToggling, setIsToggling] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
@@ -236,20 +236,7 @@ const ShopDetail = () => {
             <span className="sd-topbar-title">Shop Details</span>
           </div>
           <div className="sd-topbar-right">
-            <div style={{ position: 'relative' }}>
-              <button className="sd-notif-btn" onClick={() => setShowNotif(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, position: 'relative' }}>
-                <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
-                  <path d="M16 17H0v-2l2-2V8c0-3.31 2.69-6 6-6s6 2.69 6 6v5l2 2v2zM8 20a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#5f5e5e"/>
-                </svg>
-                <span style={{ position: 'absolute', top: 2, right: 2, width: 8, height: 8, borderRadius: '50%', backgroundColor: '#ff6b00' }} />
-              </button>
-              {showNotif && (
-                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
-                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
-                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
-                </div>
-              )}
-            </div>
+            <NotificationDropdown />
             <div className="sd-topbar-avatar">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'A'}
             </div>

@@ -60,11 +60,27 @@ const countAllUnresolved = async () => {
     return count;
 };
 
+const findAllUnresolvedWithDetails = async () => {
+    const [rows] = await pool.query(
+        `SELECT a.alert_id, a.type, a.created_at, a.is_resolved,
+                p.name AS product_name, p.current_quantity, p.min_quantity,
+                s.shop_id, s.shop_name
+         FROM alerts a
+         JOIN products p ON a.product_id = p.product_id
+         JOIN shops s ON a.shop_id = s.shop_id
+         WHERE a.is_resolved = FALSE
+         ORDER BY a.created_at DESC
+         LIMIT 20`
+    );
+    return rows;
+};
+
 module.exports = {
     createIfNotExists,
     resolveByProduct,
     findAllByShop,
     findById,
     resolveById,
-    countAllUnresolved
+    countAllUnresolved,
+    findAllUnresolvedWithDetails
 };

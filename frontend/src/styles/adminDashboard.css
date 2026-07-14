@@ -210,26 +210,6 @@
   gap: 16px;
 }
 
-.dash-notif-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px;
-  position: relative;
-}
-
-.dash-notif-btn::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #ff6b00;
-}
-
 .dash-topbar-avatar {
   width: 32px;
   height: 32px;

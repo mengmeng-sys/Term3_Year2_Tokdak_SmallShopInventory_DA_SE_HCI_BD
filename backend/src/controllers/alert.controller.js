@@ -28,8 +28,18 @@ const getAdminAlertCount = async (req, res, next) => {
     }
 };
 
+const getAdminNotifications = async (req, res, next) => {
+    try {
+        const data = await alertService.getAdminNotifications();
+        res.status(200).json({ data });
+    } catch (err) {
+        next(err);
+    }
+};
+
 module.exports = {
        getActiveAlerts,
        resolveAlert,
-       getAdminAlertCount
+       getAdminAlertCount,
+       getAdminNotifications
 }

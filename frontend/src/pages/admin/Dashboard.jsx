@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 import dashboardService from '../../services/dashboardService';
 import shopService from '../../services/shopService';
 import { formatDate } from '../../utils/formatDate';
@@ -107,6 +108,7 @@ const AdminDashboard = () => {
         <div className="dash-topbar">
           <div className="dash-topbar-title">Dashboard Overview</div>
           <div className="dash-topbar-actions">
+            <NotificationDropdown />
             <div className="dash-topbar-avatar">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'A'}
             </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 import userService from '../../services/userService';
 import '../../styles/userManagement.css';
 
@@ -11,14 +12,6 @@ function SearchIcon() {
   return (
     <svg className="um-search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
       <path d="M12.5 11h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.5 6.5 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L12.5 11zm-6 0C4.01 11 2 8.99 2 6.5S4.01 2 6.5 2 11 4.01 11 6.5 8.99 11 6.5 11z" fill="#5f5e5e"/>
-    </svg>
-  );
-}
-
-function NotifIcon() {
-  return (
-    <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
-      <path d="M16 17H0v-2l2-2V8c0-3.31 2.69-6 6-6s6 2.69 6 6v5l2 2v2zM8 20a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#5f5e5e"/>
     </svg>
   );
 }
@@ -69,7 +62,6 @@ const UserManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [showNotif, setShowNotif] = useState(false);
   const debounceRef = useRef(null);
 
   const fetchUsers = useCallback(async (page, term, status) => {
@@ -168,18 +160,7 @@ const UserManagement = () => {
         <div className="um-topbar">
           <span className="um-topbar-title">User Management</span>
           <div className="um-topbar-right">
-            <div style={{ position: 'relative' }}>
-              <button className="um-notif-btn" onClick={() => setShowNotif(v => !v)}>
-                <NotifIcon />
-                <span className="um-notif-dot" />
-              </button>
-              {showNotif && (
-                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
-                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
-                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
-                </div>
-              )}
-            </div>
+            <NotificationDropdown />
             <div className="um-admin-badge">{user ? getUserInitials(user) : 'A'}</div>
           </div>
         </div>

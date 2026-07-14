@@ -4,6 +4,7 @@ const getAll = (page = 1, limit = 10) => api.get(`/backups?page=${page}&limit=${
 const getStats = () => api.get('/backups/stats');
 const getById = (id) => api.get(`/backups/${id}`);
 const create = (data) => api.post('/backups', data);
+const download = (id) => api.get(`/backups/${id}/download`, { responseType: 'blob' });
 const remove = (id) => api.delete(`/backups/${id}`);
 
-export default { getAll, getStats, getById, create, remove };
+export default { getAll, getStats, getById, create, download, remove };

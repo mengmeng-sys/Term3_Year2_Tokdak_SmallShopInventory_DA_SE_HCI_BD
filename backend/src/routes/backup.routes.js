@@ -10,5 +10,6 @@ router.get('/stats', authMiddleware, roleMiddleware('admin'), backupController.g
 router.get('/', authMiddleware, roleMiddleware('admin'), backupController.getAllBackups);
 router.get('/:id', authMiddleware, roleMiddleware('admin'), backupController.getBackupById);
 router.post('/', authMiddleware, roleMiddleware('admin'), backupController.createBackup);
+router.get('/:id/download', authMiddleware, roleMiddleware('admin'), backupController.downloadBackup);
 router.delete('/:id', authMiddleware, roleMiddleware('admin'), backupController.deleteBackup);
 module.exports = router;

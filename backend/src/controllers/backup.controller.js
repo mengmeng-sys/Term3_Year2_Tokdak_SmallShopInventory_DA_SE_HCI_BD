@@ -55,6 +55,19 @@ const createBackup = async (req, res, next) => {
     }
 };
 
+const downloadBackup = async (req, res, next) => {
+    try {
+        const result = await backupService.getBackupFilePath(req.params.id);
+        if (!result) {
+            return res.status(404).json({ message: 'Backup not found' });
+        }
+        const { backup, filePath } = result;
+        res.download(filePath, backup.file_name);
+    } catch (error) {
+        next(error);
+    }
+};
+
 const deleteBackup = async (req, res, next) => {
     try {
         const result = await backupService.deleteBackup(
@@ -80,5 +93,6 @@ module.exports = {
     getBackupStats,
     getBackupById,
     createBackup,
+    downloadBackup,
     deleteBackup
 };

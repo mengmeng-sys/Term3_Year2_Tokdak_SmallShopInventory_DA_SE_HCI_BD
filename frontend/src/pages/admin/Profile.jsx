@@ -1,18 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 import authService from '../../services/authService';
 import userService from '../../services/userService';
 import { formatDate } from '../../utils/formatDate';
 import '../../styles/adminProfile.css';
-
-function BellIcon() {
-  return (
-    <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
-      <path d="M16 17H0v-2l2-2V8c0-3.31 2.69-6 6-6s6 2.69 6 6v5l2 2v2zM8 20a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#5f5e5e"/>
-    </svg>
-  );
-}
 
 function CameraIcon() {
   return (
@@ -60,7 +53,6 @@ const AdminProfile = () => {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
@@ -214,18 +206,7 @@ const AdminProfile = () => {
         <div className="ap-topbar">
           <span className="ap-topbar-title">My Profile</span>
           <div className="ap-topbar-right" style={{ position: 'relative' }}>
-            <div style={{ position: 'relative' }}>
-              <button className="ap-notif-btn" onClick={() => setShowNotif(v => !v)}>
-                <BellIcon />
-                <span className="ap-notif-dot" />
-              </button>
-              {showNotif && (
-                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
-                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
-                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
-                </div>
-              )}
-            </div>
+            <NotificationDropdown />
             <div className="ap-topbar-avatar">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />

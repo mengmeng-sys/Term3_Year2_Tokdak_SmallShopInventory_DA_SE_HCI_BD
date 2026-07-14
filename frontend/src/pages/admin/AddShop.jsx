@@ -3,6 +3,7 @@ import { Eye, EyeOff, Mail, Info, ArrowRight, CheckCircle, ShieldAlert } from "l
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AdminSidebar from "../../components/common/AdminSidebar";
+import NotificationDropdown from "../../components/common/NotificationDropdown";
 import api from "../../services/axiosInstance";
 import "../../styles/add-new-shop.css";
 
@@ -113,6 +114,7 @@ const AddShop = () => {
             <span className="ans-topbar-title">Add New Shop</span>
           </div>
           <div className="ans-topbar-right">
+            <NotificationDropdown />
             <Mail size={20} color="#5f5e5e" />
             <div style={{ width: 1, height: 32, backgroundColor: "#e2dfde" }} />
             <div className="ans-topbar-avatar">{getUserInitials()}</div>

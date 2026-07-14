@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 import shopService from '../../services/shopService';
 import '../../styles/shopsList.css';
 
@@ -32,13 +33,7 @@ function SearchIcon() {
   );
 }
 
-function NotifIcon() {
-  return (
-    <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
-      <path d="M16 17H0v-2l2-2V8c0-3.31 2.69-6 6-6s6 2.69 6 6v5l2 2v2zM8 20a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#5f5e5e"/>
-    </svg>
-  );
-}
+
 
 function PlusIcon() {
   return (
@@ -91,7 +86,6 @@ const ShopsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
-  const [showNotif, setShowNotif] = useState(false);
   const [showLang, setShowLang] = useState(false);
   const debounceRef = useRef(null);
 
@@ -202,20 +196,9 @@ const ShopsList = () => {
             <span className="shops-total-badge">{stats.total} Total</span>
           </div>
           <div className="shops-topbar-actions">
+            <NotificationDropdown />
             <div style={{ position: 'relative' }}>
-              <button className="shops-notif-btn" onClick={() => { setShowNotif(v => !v); setShowLang(false); }}>
-                <NotifIcon />
-                <span className="shops-notif-dot" />
-              </button>
-              {showNotif && (
-                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
-                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
-                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
-                </div>
-              )}
-            </div>
-            <div style={{ position: 'relative' }}>
-              <button className="shops-lang-btn" onClick={() => { setShowLang(v => !v); setShowNotif(false); }}>
+              <button className="shops-lang-btn" onClick={() => { setShowLang(v => !v); }}>
                 <GlobeIcon />
                 <ChevronDownIcon />
               </button>

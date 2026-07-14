@@ -1,18 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
+import NotificationDropdown from '../../components/common/NotificationDropdown';
 import backupService from '../../services/backupService';
+import shopService from '../../services/shopService';
 import '../../styles/backupManagement.css';
 
 const PAGE_SIZE = 10;
-
-function BellIcon() {
-  return (
-    <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
-      <path d="M16 17H0v-2l2-2V8c0-3.31 2.69-6 6-6s6 2.69 6 6v5l2 2v2zM8 20a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2z" fill="#5f5e5e"/>
-    </svg>
-  );
-}
 
 function SettingsIcon() {
   return (
@@ -135,8 +129,9 @@ const BackupManagement = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [triggering, setTriggering] = useState(false);
-  const [showNotif, setShowNotif] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [shops, setShops] = useState([]);
+  const [selectedShopId, setSelectedShopId] = useState('all');
 
   const fetchBackups = async (page) => {
     const res = await backupService.getAll(page, PAGE_SIZE);
@@ -153,12 +148,23 @@ const BackupManagement = () => {
     setStats(prev => ({ ...prev, ...data }));
   };
 
+  const fetchShops = async () => {
+    try {
+      const res = await shopService.getAll(1, 200);
+      const body = res?.data?.data || res?.data || {};
+      const rows = body.rows || [];
+      setShops(rows);
+    } catch (err) {
+      console.error('Error fetching shops:', err);
+    }
+  };
+
   useEffect(() => {
     mountedRef.current = true;
     (async () => {
       try {
         setLoading(true);
-        await Promise.all([fetchBackups(1), fetchStats()]);
+        await Promise.all([fetchBackups(1), fetchStats(), fetchShops()]);
       } catch (err) {
         console.error('Error loading backups:', err);
         setBackups([]);
@@ -181,35 +187,51 @@ const BackupManagement = () => {
   const triggerBackup = async () => {
     if (triggering) return;
     setTriggering(true);
-    try {
-      await backupService.create({
-        user_id: user?.user_id || 1,
-        file_name: `tokdak_backup_${Date.now()}.sql`,
-        file_size: 0,
-        note: 'Manual backup triggered from admin panel',
-      });
-      setToastMsg('Backup initiated successfully');
+
+    const targets = selectedShopId === 'all' ? shops : shops.filter(s => s.shop_id === Number(selectedShopId));
+    if (targets.length === 0) {
+      setToastMsg('No shops available for backup');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
-      await Promise.all([fetchBackups(1), fetchStats()]);
-    } catch (err) {
-      console.error('Error triggering backup:', err);
-      setToastMsg('Failed to trigger backup');
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    } finally {
       setTriggering(false);
+      return;
     }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const shop of targets) {
+      try {
+        await backupService.create({
+          shop_id: shop.shop_id,
+          user_id: user?.user_id || 1,
+          note: selectedShopId === 'all' ? `Bulk backup for ${shop.shop_name}` : 'Manual backup triggered from admin panel',
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`Backup failed for shop #${shop.shop_id}:`, err);
+        failCount++;
+      }
+    }
+
+    const msg = targets.length === 1
+      ? (successCount > 0 ? 'Backup initiated successfully' : 'Failed to trigger backup')
+      : `Backup complete: ${successCount} succeeded, ${failCount} failed`;
+    setToastMsg(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+    await Promise.all([fetchBackups(1), fetchStats()]);
+    setTriggering(false);
   };
 
   const downloadBackup = async (backup) => {
     try {
-      const content = JSON.stringify(backup, null, 2);
-      const blob = new Blob([content], { type: 'application/json' });
+      const res = await backupService.download(backup.backup_id);
+      const blob = new Blob([res.data], { type: 'application/sql' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = backup.file_name || `backup_${backup.backup_id}.json`;
+      a.download = backup.file_name || `backup_${backup.backup_id}.sql`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -219,17 +241,18 @@ const BackupManagement = () => {
       setTimeout(() => setShowToast(false), 3000);
     } catch (err) {
       console.error('Error downloading backup:', err);
+      setToastMsg('Backup file not available on server');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
-
   const retryBackup = async (backup) => {
     if (triggering) return;
     setTriggering(true);
     try {
       await backupService.create({
+        shop_id: backup.shop_id,
         user_id: user?.user_id || 1,
-        file_name: `retry_${backup.file_name || `tokdak_backup_${Date.now()}.sql`}`,
-        file_size: 0,
         note: `Retry of backup #${backup.backup_id}`,
       });
       setToastMsg('Retry backup initiated');
@@ -290,18 +313,7 @@ const BackupManagement = () => {
         <div className="bm-topbar">
           <span className="bm-topbar-title">Backup Management</span>
           <div className="bm-topbar-right" style={{ position: 'relative' }}>
-            <div style={{ position: 'relative' }}>
-              <button className="bm-notif-btn" onClick={() => { setShowNotif(v => !v); setShowSettings(false); }}>
-                <BellIcon />
-                <span className="bm-notif-dot" />
-              </button>
-              {showNotif && (
-                <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 8, width: 280, background: '#fff', border: '1px solid #e2bfb0', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, padding: 16 }}>
-                  <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>Notifications</p>
-                  <p style={{ fontSize: 13, color: '#5f5e5e' }}>No new notifications</p>
-                </div>
-              )}
-            </div>
+            <NotificationDropdown />
             <div style={{ position: 'relative' }}>
               <button className="bm-settings-btn" onClick={() => { setShowSettings(v => !v); setShowNotif(false); }}>
                 <SettingsIcon />
@@ -325,10 +337,23 @@ const BackupManagement = () => {
         <div className="bm-content">
           <div className="bm-action-header">
             <p className="bm-subtitle">Manage and monitor database snapshots for all merchant shops.</p>
-            <button className="bm-btn-trigger" onClick={triggerBackup} disabled={triggering}>
-              <CloudUploadIcon />
-              {triggering ? 'Triggering...' : 'Trigger New Backup'}
-            </button>
+            <div className="bm-trigger-row" style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 12 }}>
+              <select
+                className="bm-shop-select"
+                value={selectedShopId}
+                onChange={(e) => setSelectedShopId(e.target.value)}
+                style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #d4d2d0', fontSize: 13, background: '#fff', minWidth: 180 }}
+              >
+                <option value="all">All Shops</option>
+                {shops.map((s) => (
+                  <option key={s.shop_id} value={s.shop_id}>{s.shop_name}</option>
+                ))}
+              </select>
+              <button className="bm-btn-trigger" onClick={triggerBackup} disabled={triggering}>
+                <CloudUploadIcon />
+                {triggering ? 'Triggering...' : 'Trigger New Backup'}
+              </button>
+            </div>
           </div>
 
           <div className="bm-stats-grid">

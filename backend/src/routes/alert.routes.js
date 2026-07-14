@@ -8,6 +8,7 @@ const attachShop = require('../middlewares/attachShop.middleware');
 
 router.get('/', authMiddleware,roleMiddleware('client'),attachShop,alertController.getActiveAlerts);
 router.get('/admin/count', authMiddleware,roleMiddleware('admin'),alertController.getAdminAlertCount);
+router.get('/admin/notifications', authMiddleware,roleMiddleware('admin'),alertController.getAdminNotifications);
 router.patch('/:id/resolve', authMiddleware,roleMiddleware('client'),attachShop,alertController.resolveAlert);
 
 module.exports = router;

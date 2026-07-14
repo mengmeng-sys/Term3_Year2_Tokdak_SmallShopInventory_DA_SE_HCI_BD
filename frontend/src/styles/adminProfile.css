@@ -70,24 +70,6 @@
   gap: 16px;
 }
 
-.ap-notif-btn {
-  position: relative;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.ap-notif-dot {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #ff6b00;
-}
-
 .ap-topbar-avatar {
   width: 40px;
   height: 40px;
