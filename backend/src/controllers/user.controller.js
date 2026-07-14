@@ -1,4 +1,5 @@
 const authService = require('../services/user.service');
+const activityService = require('../services/activity.service');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -33,8 +34,22 @@ const updateUser = async (req, res) => {
             return res.status(403).json({ message: 'Forbidden: You can only update your own account' });
         }
 
+        const targetUser = await authService.getUserById(targetUserId);
         const result = await authService.updateUser(targetUserId, updateData);
-        res.json({ message: 'User updated successfully' });
+
+        if (loggedInUser.role === 'admin') {
+            const changedFields = Object.keys(updateData).join(', ');
+            activityService.logActivity(
+                loggedInUser.id,
+                'update_user',
+                targetUser?.name || 'User #' + targetUserId,
+                targetUser?.email || null,
+                'Changed: ' + changedFields
+            ).catch(() => {});
+        }
+
+        const updatedUser = await authService.getUserById(targetUserId);
+        res.json({ message: 'User updated successfully', data: updatedUser });
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -49,7 +64,19 @@ const deleteUser = async (req, res) => {
             return res.status(403).json({ message: 'Forbidden: You can only delete your own account' });
         }
 
+        const targetUser = await authService.getUserById(targetUserId);
         const result = await authService.deleteUser(targetUserId);
+
+        if (loggedInUser.role === 'admin') {
+            activityService.logActivity(
+                loggedInUser.id,
+                'delete_user',
+                targetUser?.name || 'User #' + targetUserId,
+                targetUser?.email || null,
+                null
+            ).catch(() => {});
+        }
+
         res.json({ message: 'User deleted successfully' });
     } catch (error) {
         if (error.code === 'ER_ROW_IS_REFERENCED_2') {
@@ -63,8 +90,19 @@ const toggleUserStatus = async (req, res) => {
     try {
         const targetUserId = req.params.id;
         const { is_active } = req.body;
+        const loggedInUser = req.user;
 
+        const targetUser = await authService.getUserById(targetUserId);
         const result = await authService.toggleUserStatus(targetUserId, is_active);
+
+        activityService.logActivity(
+            loggedInUser.id,
+            'toggle_user_status',
+            targetUser?.name || 'User #' + targetUserId,
+            targetUser?.email || null,
+            is_active ? 'Activated' : 'Deactivated'
+        ).catch(() => {});
+
         res.json({ message: 'User status updated successfully' });
     } catch (error) {
         res.status(404).json({ message: error.message });

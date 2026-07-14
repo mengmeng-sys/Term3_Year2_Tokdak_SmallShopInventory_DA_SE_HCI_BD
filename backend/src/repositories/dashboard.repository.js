@@ -51,11 +51,25 @@ const getAdminStats = async () =>{
          ORDER BY s.created_at DESC LIMIT 5`
     );
 
+    const [[ownerActivity]] = await pool.query(
+        `SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN u.is_active = TRUE THEN 1 ELSE 0 END) AS active,
+            SUM(CASE WHEN u.is_active = FALSE THEN 1 ELSE 0 END) AS inactive
+         FROM shops s
+         JOIN users u ON s.user_id = u.user_id`
+    );
+
     return {
         total_shops: totalShops.count,
         total_clients: totalClients.count,
         active_clients: activeClients.count,
-        recent_shops: recentShops
+        recent_shops: recentShops,
+        owner_activity: {
+            total: ownerActivity.total || 0,
+            active: ownerActivity.active || 0,
+            inactive: ownerActivity.inactive || 0
+        }
     };
 };
 

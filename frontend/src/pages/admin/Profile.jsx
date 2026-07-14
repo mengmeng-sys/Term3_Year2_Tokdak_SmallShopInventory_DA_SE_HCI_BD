@@ -48,7 +48,7 @@ function CalendarIcon() {
 }
 
 const AdminProfile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const mountedRef = useRef(true);
 
   const [loading, setLoading] = useState(true);
@@ -117,7 +117,13 @@ const AdminProfile = () => {
     setSaving(true);
     setSaveMessage('');
     try {
-      await userService.update(user?.user_id, { name, email, DOB: dob, gender });
+      const response = await userService.update(user?.user_id, { name, email, DOB: dob, gender });
+      const updatedUser = response.data?.data;
+      if (updatedUser) {
+        updateUser({ name: updatedUser.name, email: updatedUser.email });
+      } else {
+        updateUser({ name, email });
+      }
       setSaveMessage('Profile updated successfully');
     } catch (err) {
       setSaveMessage(err.response?.data?.message || 'Failed to update profile');
@@ -148,7 +154,9 @@ const AdminProfile = () => {
       formData.append('avatar', file);
       const res = await userService.uploadAvatar(user?.user_id, formData);
       const base = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
-      setAvatarUrl(`${base}${res.data.avatar_url}`);
+      const avatarUrlValue = `${base}${res.data.avatar_url}`;
+      setAvatarUrl(avatarUrlValue);
+      updateUser({ avatar_url: res.data.avatar_url });
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to upload avatar');
     } finally {

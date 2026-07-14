@@ -315,7 +315,7 @@ const BackupManagement = () => {
           <div className="bm-topbar-right" style={{ position: 'relative' }}>
             <NotificationDropdown />
             <div style={{ position: 'relative' }}>
-              <button className="bm-settings-btn" onClick={() => { setShowSettings(v => !v); setShowNotif(false); }}>
+              <button className="bm-settings-btn" onClick={() => setShowSettings(v => !v)}>
                 <SettingsIcon />
               </button>
               {showSettings && (

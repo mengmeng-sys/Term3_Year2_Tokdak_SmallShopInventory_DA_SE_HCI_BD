@@ -17,6 +17,7 @@ const categoryRoutes = require('./routes/category.routes');
 const alertRoutes = require('./routes/alert.routes')
 const dashboardRoutes = require('./routes/dashboard.routes');
 const shopSittingsRoutes = require('./routes/shop_settings.routes');
+const activityRoutes = require('./routes/activity.routes');
 
 
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/alerts',alertRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/shop-settings',shopSittingsRoutes);
+app.use('/api/activities', activityRoutes);
 
 
 // Error handler

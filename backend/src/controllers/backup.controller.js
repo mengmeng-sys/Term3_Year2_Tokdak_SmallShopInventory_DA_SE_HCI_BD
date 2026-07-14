@@ -1,4 +1,5 @@
 const backupService = require('../services/backup.service');
+const activityService = require('../services/activity.service');
 
 const getAllBackups = async (req, res, next) => {
     try {
@@ -46,6 +47,14 @@ const createBackup = async (req, res, next) => {
             req.body
         );
 
+        activityService.logActivity(
+            req.user.id,
+            'create_backup',
+            'Backup #' + backupId,
+            null,
+            null
+        ).catch(() => {});
+
         res.status(201).json({
             message: 'Backup record created',
             backupId
@@ -70,6 +79,7 @@ const downloadBackup = async (req, res, next) => {
 
 const deleteBackup = async (req, res, next) => {
     try {
+        const backup = await backupService.getBackupById(req.params.id);
         const result = await backupService.deleteBackup(
             req.params.id
         );
@@ -79,6 +89,14 @@ const deleteBackup = async (req, res, next) => {
                 message: 'Backup not found'
             });
         }
+
+        activityService.logActivity(
+            req.user.id,
+            'delete_backup',
+            backup?.file_name || 'Backup #' + req.params.id,
+            null,
+            null
+        ).catch(() => {});
 
         res.status(200).json({
             message: 'Backup deleted'

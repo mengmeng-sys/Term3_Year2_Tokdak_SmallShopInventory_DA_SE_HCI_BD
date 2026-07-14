@@ -13,7 +13,7 @@ function dateStr(now) {
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     const yy = String(now.getFullYear()).slice(-2);
-    return `${mm}/${dd}/${yy}`;
+    return `${mm}-${dd}-${yy}`;
 }
 
 function safeName(name) {

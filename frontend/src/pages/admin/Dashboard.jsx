@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminSidebar from '../../components/common/AdminSidebar';
 import NotificationDropdown from '../../components/common/NotificationDropdown';
+import DonutChart from '../../components/common/DonutChart';
 import dashboardService from '../../services/dashboardService';
 import shopService from '../../services/shopService';
 import { formatDate } from '../../utils/formatDate';
@@ -22,6 +23,7 @@ const AdminDashboard = () => {
     activeClients: 0,
     inactiveClients: 0,
   });
+  const [ownerActivity, setOwnerActivity] = useState({ total: 0, active: 0, inactive: 0 });
   const [shops, setShops] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -36,6 +38,7 @@ const AdminDashboard = () => {
       activeClients: data.active_clients || 0,
       inactiveClients: (data.total_clients || 0) - (data.active_clients || 0),
     });
+    setOwnerActivity(data.owner_activity || { total: 0, active: 0, inactive: 0 });
     const recentShops = data.recent_shops || [];
     setShops(recentShops);
     setCurrentPage(1);
@@ -122,9 +125,6 @@ const AdminDashboard = () => {
               <h1 className="dash-page-title">System Statistics</h1>
               <p className="dash-page-subtitle">Real-time overview of your retail ecosystem.</p>
             </div>
-            <button className="dash-btn-primary" onClick={() => navigate('/admin/shops/add')}>
-              + Add New Shop
-            </button>
           </div>
 
           <div className="dash-stats-grid">
@@ -142,6 +142,45 @@ const AdminDashboard = () => {
               </div>
             ))}
           </div>
+
+          {ownerActivity.total > 0 && (
+            <div className="dash-analysis-section">
+              <div className="dash-analysis-card">
+                <h3 className="dash-analysis-title">Owner Activity Breakdown</h3>
+                <p className="dash-analysis-subtitle">
+                  {ownerActivity.active} of {ownerActivity.total} shop owners are currently active.
+                </p>
+                <div className="dash-analysis-body">
+                  <div className="dash-analysis-chart">
+                    <DonutChart
+                      size={140}
+                      strokeWidth={28}
+                      segments={[
+                        { value: ownerActivity.active, color: '#22c55e' },
+                        { value: ownerActivity.inactive, color: '#ef4444' },
+                      ]}
+                    />
+                  </div>
+                  <div className="dash-analysis-legend">
+                    <div className="dash-analysis-legend-item">
+                      <span className="dash-analysis-dot" style={{ backgroundColor: '#22c55e' }} />
+                      <div>
+                        <span className="dash-analysis-legend-value">{ownerActivity.active}</span>
+                        <span className="dash-analysis-legend-label">Active Owners</span>
+                      </div>
+                    </div>
+                    <div className="dash-analysis-legend-item">
+                      <span className="dash-analysis-dot" style={{ backgroundColor: '#ef4444' }} />
+                      <div>
+                        <span className="dash-analysis-legend-value">{ownerActivity.inactive}</span>
+                        <span className="dash-analysis-legend-label">Inactive Owners</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="dash-table-section">
             <div className="dash-table-header">

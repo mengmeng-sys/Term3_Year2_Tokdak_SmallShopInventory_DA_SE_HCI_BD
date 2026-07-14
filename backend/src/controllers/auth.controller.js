@@ -1,4 +1,5 @@
 const authService = require('../services/auth.service');
+const activityService = require('../services/activity.service');
 
 const login = async (req, res, next) => {
     try {
@@ -68,6 +69,16 @@ const verifyRegistration = async (
                 otp
             );
 
+        if (req.user && result?.user) {
+            activityService.logActivity(
+                req.user.id,
+                'create_user',
+                result.user.name || result.user.email,
+                result.user.email,
+                null
+            ).catch(() => {});
+        }
+
         res.status(201).json({
             message: result.message,
             data: result
@@ -131,6 +142,14 @@ const changePassword = async (req, res, next) => {
                 oldPassword,
                 newPassword
             );
+
+        activityService.logActivity(
+            userId,
+            'change_password',
+            'User #' + userId,
+            null,
+            null
+        ).catch(() => {});
 
         res.status(200).json({
             message: result.message
