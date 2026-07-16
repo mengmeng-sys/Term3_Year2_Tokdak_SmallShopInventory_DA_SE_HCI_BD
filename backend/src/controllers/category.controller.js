@@ -3,7 +3,7 @@ const shopRepository = require('../repositories/shop.repository');
 
 const create = async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, description } = req.body;
 
         const shop = await shopRepository.findByUserId(req.user.id);
 
@@ -15,7 +15,8 @@ const create = async (req, res) => {
 
         const result = await categoryService.create(
             shop.shop_id,
-            name
+            name,
+            description
         );
 
         res.status(201).json({
@@ -85,7 +86,7 @@ const getById = async (req, res) => {
 const update = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const { name } = req.body;
+        const { name, description } = req.body;
 
         const shop = await shopRepository.findByUserId(req.user.id);
 
@@ -98,7 +99,8 @@ const update = async (req, res) => {
         await categoryService.update(
             categoryId,
             shop.shop_id,
-            name
+            name,
+            description
         );
 
         res.status(200).json({

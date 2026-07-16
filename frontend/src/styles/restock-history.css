@@ -171,7 +171,7 @@
 
 .rh-col-header-row {
   display: grid;
-  grid-template-columns: 2fr 1.4fr 2fr 1.6fr;
+  grid-template-columns: 2fr 1fr 1fr 2fr 1.6fr;
   background-color: #f5f3f3;
   border-bottom: 1px solid #ddd;
 }
@@ -189,7 +189,7 @@
 
 .rh-row {
   display: grid;
-  grid-template-columns: 2fr 1.4fr 2fr 1.6fr;
+  grid-template-columns: 2fr 1fr 1fr 2fr 1.6fr;
   align-items: center;
   border-top: 1px solid #f0f0f0;
   transition: background-color 0.15s;
@@ -235,12 +235,45 @@
   display: inline-block;
   padding: 6px 12px;
   border-radius: 9999px;
-  background-color: #dcfce7;
-  color: #15803d;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   white-space: nowrap;
+}
+
+.rh-qty-badge--add {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.rh-qty-badge--subtract {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Type cell */
+.rh-type-cell {
+  padding: 14px 24px;
+}
+
+.rh-type-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rh-type-badge--restock {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.rh-type-badge--sale {
+  background-color: #ffedd5;
+  color: #c2410c;
 }
 
 /* Note cell */
@@ -348,7 +381,7 @@
 
   .rh-col-header-row,
   .rh-row {
-    grid-template-columns: 1.6fr 1fr 1.4fr 1.2fr;
+    grid-template-columns: 1.6fr 0.8fr 0.8fr 1.4fr 1.2fr;
   }
 }
 
@@ -371,11 +404,12 @@
 
   .rh-col-header-row,
   .rh-row {
-    grid-template-columns: 1.2fr 0.8fr 1fr 1fr;
+    grid-template-columns: 1.2fr 0.6fr 0.6fr 1fr 1fr;
   }
 
   .rh-col-header,
   .rh-product-cell,
+  .rh-type-cell,
   .rh-qty-cell,
   .rh-note-cell,
   .rh-date-cell {

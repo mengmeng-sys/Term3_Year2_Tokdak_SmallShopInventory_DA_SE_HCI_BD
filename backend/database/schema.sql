@@ -49,6 +49,7 @@ CREATE TABLE categories (
     category_id INT PRIMARY KEY AUTO_INCREMENT,
     shop_id     INT                 NOT NULL,
     name        VARCHAR(100)        NOT NULL,
+    description VARCHAR(255),
     created_at  TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_categories_shop

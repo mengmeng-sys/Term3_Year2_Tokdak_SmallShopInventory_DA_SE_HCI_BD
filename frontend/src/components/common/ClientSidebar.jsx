@@ -112,7 +112,7 @@ const ClientSidebar = () => {
     { key: 'products',   label: 'Products',       path: '/client/products' },
     { key: 'stock',      label: 'Stock',          path: '/client/stock' },
     { key: 'alerts',     label: 'Alerts',         path: '/client/alerts' },
-    { key: 'history',    label: 'Restock History', path: '/client/restock-history' },
+    { key: 'history',    label: 'Stock History', path: '/client/restock-history' },
     { key: 'reports',    label: 'Reports',        path: '/client/reports' },
     { key: 'profile',    label: 'Profile',        path: '/client/profile' },
   ];

@@ -1,11 +1,11 @@
 const categoryRepository = require('../repositories/category.repository');
 
-const create = async (shopId, name) => {
+const create = async (shopId, name, description) => {
     if (!name) {
         throw new Error('Category name is required');
     }
 
-    return await categoryRepository.create(shopId, name);
+    return await categoryRepository.create(shopId, name, description);
 };
 
 const getAll = async (shopId) => {
@@ -25,11 +25,12 @@ const getById = async (categoryId, shopId) => {
     return category;
 };
 
-const update = async (categoryId, shopId, name) => {
+const update = async (categoryId, shopId, name, description) => {
     const result = await categoryRepository.update(
         categoryId,
         shopId,
-        name
+        name,
+        description
     );
 
     if (result.affectedRows === 0) {

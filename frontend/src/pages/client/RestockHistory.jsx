@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import ClientSidebar from '../../components/common/ClientSidebar';
 import stockService from '../../services/stockService';
 import { formatDateTime } from '../../utils/formatDate';
-import { Package, ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
+import { Package, ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight, Bell, TrendingUp, TrendingDown } from 'lucide-react';
 import '../../styles/adminDashboard.css';
 import '../../styles/restock-history.css';
 
@@ -31,6 +31,8 @@ const RestockHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [totalAdded, setTotalAdded] = useState(0);
+  const [totalSubtracted, setTotalSubtracted] = useState(0);
 
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -44,6 +46,8 @@ const RestockHistory = () => {
       const body = res?.data?.data || res?.data || [];
       const rows = Array.isArray(body) ? body : body.rows || [];
       setTotal(rows.length);
+      setTotalAdded(rows.filter(h => h.quantity_changed > 0).reduce((acc, h) => acc + h.quantity_changed, 0));
+      setTotalSubtracted(rows.filter(h => h.quantity_changed < 0).reduce((acc, h) => acc + Math.abs(h.quantity_changed), 0));
       setTotalPages(Math.max(1, Math.ceil(rows.length / PAGE_SIZE)));
       const start = (page - 1) * PAGE_SIZE;
       setHistory(rows.slice(start, start + PAGE_SIZE));
@@ -96,8 +100,9 @@ const RestockHistory = () => {
   }
 
   const summary = {
-    totalRestocks: total,
-    totalQty: history.reduce((acc, h) => acc + (h.quantity || 0), 0),
+    totalTransactions: total,
+    totalAdded,
+    totalSubtracted,
   };
 
   return (
@@ -106,7 +111,7 @@ const RestockHistory = () => {
 
       <div className="dash-main">
         <div className="dash-topbar" style={{ height: 64 }}>
-          <div className="dash-topbar-title">Restock History</div>
+          <div className="dash-topbar-title">Stock History</div>
           <div className="dash-topbar-actions">
             <button
               className="rh-btn-export"
@@ -153,7 +158,7 @@ const RestockHistory = () => {
           <div className="rh-cards-row">
             <div className="rh-stat-card">
               <div className="rh-stat-info">
-                <div className="rh-stat-label">TOTAL RESTOCKS THIS MONTH</div>
+                <div className="rh-stat-label">TOTAL TRANSACTIONS</div>
                 <div className="rh-stat-value">{total}</div>
                 <div className="rh-stat-sub">
                   <RefreshCw size={14} color="#16a34a" />
@@ -167,13 +172,16 @@ const RestockHistory = () => {
 
             <div className="rh-stat-card">
               <div className="rh-stat-info">
-                <div className="rh-stat-label">TOTAL QUANTITY ADDED</div>
+                <div className="rh-stat-label">TOTAL QUANTITY MOVED</div>
                 <div className="rh-stat-value">
-                  {summary.totalQty.toLocaleString()}
+                  {summary.totalAdded.toLocaleString()} / {summary.totalSubtracted.toLocaleString()}
                 </div>
                 <div className="rh-stat-sub">
-                  <RefreshCw size={14} color="#5f5e5e" />
-                  <span className="rh-stat-sub-text gray">Across {total} transactions</span>
+                  <TrendingUp size={14} color="#16a34a" />
+                  <span className="rh-stat-sub-text green">Added</span>
+                  <span style={{ color: '#9ca3af', margin: '0 4px' }}>/</span>
+                  <TrendingDown size={14} color="#b91c1c" />
+                  <span className="rh-stat-sub-text" style={{ color: '#b91c1c' }}>Subtracted</span>
                 </div>
               </div>
               <div className="rh-stat-icon blue">
@@ -221,7 +229,8 @@ const RestockHistory = () => {
           <div className="rh-table-wrap">
             <div className="rh-col-header-row">
               <div className="rh-col-header">PRODUCT NAME</div>
-              <div className="rh-col-header">QUANTITY ADDED</div>
+              <div className="rh-col-header">TYPE</div>
+              <div className="rh-col-header">QUANTITY</div>
               <div className="rh-col-header">NOTE</div>
               <div className="rh-col-header right">DATE AND TIME</div>
             </div>
@@ -229,6 +238,7 @@ const RestockHistory = () => {
             {history.length > 0 ? (
               history.map((h, i) => {
                 const p = getPalette(h.product_id || i);
+                const isRestock = h.quantity_changed > 0;
                 return (
                   <div key={h.transaction_id || i} className="rh-row" style={{ borderTop: i === 0 ? 'none' : undefined }}>
                     <div className="rh-product-cell">
@@ -237,10 +247,17 @@ const RestockHistory = () => {
                       </div>
                       <span className="rh-product-name">{h.product_name || 'Unknown Product'}</span>
                     </div>
-                    <div className="rh-qty-cell">
-                      <span className="rh-qty-badge">+ {h.quantity || 0}</span>
+                    <div className="rh-type-cell">
+                      <span className={`rh-type-badge ${isRestock ? 'rh-type-badge--restock' : 'rh-type-badge--sale'}`}>
+                        {isRestock ? 'Restock' : 'Sale'}
+                      </span>
                     </div>
-                    <div className="rh-note-cell">{h.note || h.type || '—'}</div>
+                    <div className="rh-qty-cell">
+                      <span className={`rh-qty-badge ${isRestock ? 'rh-qty-badge--add' : 'rh-qty-badge--subtract'}`}>
+                        {isRestock ? '+' : '-'} {Math.abs(h.quantity_changed || 0)}
+                      </span>
+                    </div>
+                    <div className="rh-note-cell">{h.note || '—'}</div>
                     <div className="rh-date-cell">{formatDateTime(h.created_at)}</div>
                   </div>
                 );
@@ -248,14 +265,14 @@ const RestockHistory = () => {
             ) : (
               <div className="rh-empty">
                 <Package size={40} color="#ccc" />
-                <p style={{ marginTop: 12 }}>No restock history found</p>
+                <p style={{ marginTop: 12 }}>No stock history found</p>
               </div>
             )}
 
             {totalPages > 1 && (
               <div className="rh-pagination">
                 <span className="rh-pagination-info">
-                  Showing <strong>{Math.min((currentPage - 1) * PAGE_SIZE + 1, total)}–{Math.min(currentPage * PAGE_SIZE, total)}</strong> of <strong>{total}</strong> restocks
+                  Showing <strong>{Math.min((currentPage - 1) * PAGE_SIZE + 1, total)}–{Math.min(currentPage * PAGE_SIZE, total)}</strong> of <strong>{total}</strong> transactions
                 </span>
                 <div className="rh-pagination-btns">
                   <button

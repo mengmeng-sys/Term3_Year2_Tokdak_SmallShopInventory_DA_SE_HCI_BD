@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Topbar from '../../components/common/Topbar';
 import ClientSidebar from '../../components/common/ClientSidebar';
 import productService from '../../services/productService';
+import categoryService from '../../services/categoryService';
 import dashboardService from '../../services/dashboardService';
 import '../../styles/adminDashboard.css';
 import '../../styles/Product.css';
@@ -61,6 +62,11 @@ const Icon = {
       <path d="M13.73 21a2 2 0 01-3.46 0" stroke="#B91C1C" strokeWidth="1.5"/>
     </svg>
   ),
+  Close: () => (
+    <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
+      <path d="M1 1l12 12M13 1L1 13" stroke="#5F5E5E" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  ),
 };
 
 function getStatus(currentQty, minQty) {
@@ -91,7 +97,208 @@ function CategoryBadge({ label }) {
   return <span className="prd-category-badge">{label}</span>;
 }
 
-function ControlsRow({ search, setSearch }) {
+/* ── Edit Modal ──────────────────────────────────────────────────────────── */
+function EditModal({ open, onClose, product, categories, onSave, submitting }) {
+  const [form, setForm] = useState({
+    name: '', description: '', price: '', category_id: '', unit: 'pcs',
+    current_quantity: 0, min_quantity: 10,
+  });
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (product) {
+      setForm({
+        name: product.name || '',
+        description: product.description || '',
+        price: product.price ?? '',
+        category_id: product.category_id || '',
+        unit: product.unit || 'pcs',
+        current_quantity: product.current_quantity ?? 0,
+        min_quantity: product.min_quantity ?? 10,
+      });
+      setErrors({});
+    }
+  }, [product]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [open, onClose]);
+
+  if (!open || !product) return null;
+
+  const handleChange = (field) => (e) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
+
+  const handleSubmit = () => {
+    const errs = {};
+    if (!form.name.trim()) errs.name = 'Required';
+    if (!form.category_id) errs.category_id = 'Required';
+    if (form.price === '' || form.price === null) errs.price = 'Required';
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    onSave({
+      name: form.name.trim(),
+      description: form.description.trim() || null,
+      price: Number(form.price) || 0,
+      category_id: Number(form.category_id),
+      unit: form.unit || 'pcs',
+      current_quantity: Number(form.current_quantity) || 0,
+      min_quantity: Number(form.min_quantity) || 0,
+    });
+  };
+
+  return (
+    <div className="prd-modal-overlay" onClick={onClose}>
+      <div className="prd-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="prd-modal-header">
+          <h2 className="prd-modal-title">Edit Product</h2>
+          <button className="prd-modal-close" onClick={onClose} aria-label="Close"><Icon.Close /></button>
+        </div>
+        <div className="prd-modal-body">
+          <div className="prd-modal-grid">
+            <div className="prd-modal-field">
+              <label className="prd-modal-label">Product Name <span className="prd-modal-required">*</span></label>
+              <input
+                className={`prd-modal-input${errors.name ? ' prd-modal-input--error' : ''}`}
+                type="text" value={form.name} onChange={handleChange('name')}
+              />
+              {errors.name && <span className="prd-modal-error">{errors.name}</span>}
+            </div>
+            <div className="prd-modal-field">
+              <label className="prd-modal-label">Category <span className="prd-modal-required">*</span></label>
+              <select
+                className={`prd-modal-input prd-modal-select${errors.category_id ? ' prd-modal-input--error' : ''}`}
+                value={form.category_id} onChange={handleChange('category_id')}
+              >
+                <option value="">Select a category</option>
+                {categories.map((c) => (
+                  <option key={c.category_id} value={c.category_id}>{c.name}</option>
+                ))}
+              </select>
+              {errors.category_id && <span className="prd-modal-error">{errors.category_id}</span>}
+            </div>
+            <div className="prd-modal-field">
+              <label className="prd-modal-label">Price ($) <span className="prd-modal-required">*</span></label>
+              <input
+                className={`prd-modal-input${errors.price ? ' prd-modal-input--error' : ''}`}
+                type="number" min={0} step="0.01" value={form.price} onChange={handleChange('price')}
+              />
+              {errors.price && <span className="prd-modal-error">{errors.price}</span>}
+            </div>
+            <div className="prd-modal-field">
+              <label className="prd-modal-label">Unit</label>
+              <select className="prd-modal-input prd-modal-select" value={form.unit} onChange={handleChange('unit')}>
+                <option value="pcs">pcs</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="L">L</option>
+                <option value="mL">mL</option>
+                <option value="box">box</option>
+                <option value="pack">pack</option>
+              </select>
+            </div>
+            <div className="prd-modal-field">
+              <label className="prd-modal-label">Current Quantity</label>
+              <input
+                className="prd-modal-input"
+                type="number" min={0} value={form.current_quantity} onChange={handleChange('current_quantity')}
+              />
+            </div>
+            <div className="prd-modal-field">
+              <label className="prd-modal-label">Min Quantity</label>
+              <input
+                className="prd-modal-input"
+                type="number" min={0} value={form.min_quantity} onChange={handleChange('min_quantity')}
+              />
+            </div>
+          </div>
+          <div className="prd-modal-field prd-modal-field--full">
+            <label className="prd-modal-label">Description</label>
+            <textarea
+              className="prd-modal-input prd-modal-textarea"
+              rows={3} value={form.description} onChange={handleChange('description')}
+              placeholder="Optional product description..."
+            />
+          </div>
+        </div>
+        <div className="prd-modal-footer">
+          <button className="prd-modal-btn prd-modal-btn--cancel" onClick={onClose}>Cancel</button>
+          <button className="prd-modal-btn prd-modal-btn--confirm" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Delete Modal ────────────────────────────────────────────────────────── */
+function DeleteModal({ open, onClose, product, onConfirm, submitting }) {
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [open, onClose]);
+
+  if (!open || !product) return null;
+
+  return (
+    <div className="prd-modal-overlay" onClick={onClose}>
+      <div className="prd-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="prd-modal-header">
+          <h2 className="prd-modal-title">Delete Product</h2>
+          <button className="prd-modal-close" onClick={onClose} aria-label="Close"><Icon.Close /></button>
+        </div>
+        <div className="prd-modal-body">
+          <p className="prd-delete-msg">
+            Are you sure you want to delete <strong>{product.name}</strong>? This action cannot be undone.
+          </p>
+        </div>
+        <div className="prd-modal-footer">
+          <button className="prd-modal-btn prd-modal-btn--cancel" onClick={onClose}>Cancel</button>
+          <button className="prd-modal-btn prd-modal-btn--delete" onClick={onConfirm} disabled={submitting}>
+            {submitting ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Controls Row ────────────────────────────────────────────────────────── */
+function ControlsRow({ search, setSearch, categories, selectedCategory, setSelectedCategory, sort, setSort }) {
+  const navigate = useNavigate();
+  const [catDropdownOpen, setCatDropdownOpen] = useState(false);
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const catDropdownRef = useRef(null);
+  const sortDropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!catDropdownOpen && !sortDropdownOpen) return;
+    const handleClick = (e) => {
+      if (catDropdownRef.current && !catDropdownRef.current.contains(e.target)) {
+        setCatDropdownOpen(false);
+      }
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target)) {
+        setSortDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [catDropdownOpen, sortDropdownOpen]);
+
+  const selectedCatLabel = selectedCategory === null
+    ? 'All Categories'
+    : categories.find((c) => c.category_id === selectedCategory)?.name || 'All Categories';
+
+  const sortLabel = sort === 'oldest' ? 'Oldest First' : 'Newest First';
+
   return (
     <div className="prd-controls-row">
       <div className="prd-search-wrap">
@@ -104,14 +311,59 @@ function ControlsRow({ search, setSearch }) {
         />
       </div>
       <div className="prd-filters">
-        <button className="prd-filter-select">
-          <span>All Categories</span>
-          <Icon.ChevronDown />
-        </button>
-        <button className="prd-filter-select">
-          <span>Sort by: Newest</span>
-          <Icon.ChevronDown />
-        </button>
+        <div className="prd-filter-dropdown" ref={catDropdownRef}>
+          <button
+            className="prd-filter-select"
+            onClick={() => { setCatDropdownOpen(!catDropdownOpen); setSortDropdownOpen(false); }}
+          >
+            <span>{selectedCatLabel}</span>
+            <Icon.ChevronDown />
+          </button>
+          {catDropdownOpen && (
+            <div className="prd-filter-menu">
+              <button
+                className={`prd-filter-option${selectedCategory === null ? ' prd-filter-option--active' : ''}`}
+                onClick={() => { setSelectedCategory(null); setCatDropdownOpen(false); }}
+              >
+                All Categories
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.category_id}
+                  className={`prd-filter-option${selectedCategory === cat.category_id ? ' prd-filter-option--active' : ''}`}
+                  onClick={() => { setSelectedCategory(cat.category_id); setCatDropdownOpen(false); }}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="prd-filter-dropdown" ref={sortDropdownRef}>
+          <button
+            className="prd-filter-select"
+            onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setCatDropdownOpen(false); }}
+          >
+            <span>Sort: {sortLabel}</span>
+            <Icon.ChevronDown />
+          </button>
+          {sortDropdownOpen && (
+            <div className="prd-filter-menu">
+              <button
+                className={`prd-filter-option${sort === 'newest' || sort === '' ? ' prd-filter-option--active' : ''}`}
+                onClick={() => { setSort('newest'); setSortDropdownOpen(false); }}
+              >
+                Newest First
+              </button>
+              <button
+                className={`prd-filter-option${sort === 'oldest' ? ' prd-filter-option--active' : ''}`}
+                onClick={() => { setSort('oldest'); setSortDropdownOpen(false); }}
+              >
+                Oldest First
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <button className="prd-add-btn" onClick={() => navigate('/client/products/add')}>
         <Icon.Plus />
@@ -121,7 +373,8 @@ function ControlsRow({ search, setSearch }) {
   );
 }
 
-function ProductTable({ products, loading, page, setPage, totalPages, totalProducts }) {
+/* ── Product Table ───────────────────────────────────────────────────────── */
+function ProductTable({ products, loading, page, setPage, totalPages, totalProducts, onEdit, onDelete }) {
   return (
     <div className="prd-table-container">
       <div className="prd-table-scroll">
@@ -152,7 +405,7 @@ function ProductTable({ products, loading, page, setPage, totalPages, totalProdu
                     </div>
                   </div>
                   <div className="prd-product-info">
-                    <span className="prd-product-name">{p.name}</span>
+                    <Link to={`/client/products/${p.product_id || p.id}`} className="prd-product-name">{p.name}</Link>
                     <span className="prd-product-sku">{p.sku || `SKU-${p.product_id || p.id}`}</span>
                   </div>
                 </div>
@@ -172,8 +425,8 @@ function ProductTable({ products, loading, page, setPage, totalPages, totalProdu
                   <StatusBadge status={status} />
                 </div>
                 <div className="prd-td prd-td--actions">
-                  <button className="prd-action-btn" title="Edit"><Icon.Edit /></button>
-                  <button className="prd-action-btn" title="Delete"><Icon.Trash /></button>
+                  <button className="prd-action-btn" title="Edit" onClick={() => onEdit(p)}><Icon.Edit /></button>
+                  <button className="prd-action-btn" title="Delete" onClick={() => onDelete(p)}><Icon.Trash /></button>
                 </div>
               </div>
             );
@@ -202,6 +455,7 @@ function ProductTable({ products, loading, page, setPage, totalPages, totalProdu
   );
 }
 
+/* ── Summary Cards ───────────────────────────────────────────────────────── */
 function SummaryCards({ totalProducts, lowStock, outOfStock }) {
   return (
     <div className="prd-summary-row">
@@ -236,8 +490,8 @@ function SummaryCards({ totalProducts, lowStock, outOfStock }) {
   );
 }
 
+/* ── Main Page ───────────────────────────────────────────────────────────── */
 const ProductManagement = () => {
-  const navigate = useNavigate();
   const mountedRef = useRef(true);
 
   const [products, setProducts] = useState([]);
@@ -247,36 +501,66 @@ const ProductManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [summary, setSummary] = useState({ total_products: 0, low_stock: 0, out_of_stock: 0 });
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [sort, setSort] = useState('newest');
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteProduct, setDeleteProduct] = useState(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
 
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = { page, limit: 10 };
+      if (search.trim()) params.search = search.trim();
+      if (selectedCategory !== null) params.category_id = selectedCategory;
+      if (sort === 'oldest') params.sort = 'oldest';
+      const res = await productService.getAll(params);
+      if (!mountedRef.current) return;
+      const data = res.data?.data || res.data || [];
+      const list = Array.isArray(data) ? data : data.products || data.data || [];
+      setProducts(list);
+      setTotalProducts(data.total || list.length || 0);
+      setTotalPages(data.totalPages || Math.ceil((data.total || list.length) / 10) || 1);
+    } catch {
+      if (!mountedRef.current) return;
+      setProducts([]);
+      setTotalProducts(0);
+      setTotalPages(1);
+    } finally {
+      if (mountedRef.current) setLoading(false);
+    }
+  }, [page, search, selectedCategory, sort]);
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
+    const fetchCategories = async () => {
       try {
-        const params = { page, limit: 10 };
-        if (search.trim()) params.search = search.trim();
-        const res = await productService.getAll(params);
+        const res = await categoryService.getAll();
         if (!mountedRef.current) return;
         const data = res.data?.data || res.data || [];
-        const list = Array.isArray(data) ? data : data.products || data.data || [];
-        setProducts(list);
-        setTotalProducts(data.total || list.length || 0);
-        setTotalPages(data.totalPages || Math.ceil((data.total || list.length) / 10) || 1);
-      } catch {
-        if (!mountedRef.current) return;
-        setProducts([]);
-        setTotalProducts(0);
-        setTotalPages(1);
-      } finally {
-        if (mountedRef.current) setLoading(false);
-      }
+        setCategories(Array.isArray(data) ? data : []);
+      } catch { /* ignore */ }
     };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategory, sort]);
+
+  useEffect(() => {
     fetchProducts();
-  }, [page, search]);
+  }, [fetchProducts]);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -294,13 +578,51 @@ const ProductManagement = () => {
     fetchSummary();
   }, []);
 
+  const handleEdit = async (data) => {
+    if (!editProduct) return;
+    setEditSubmitting(true);
+    try {
+      await productService.update(editProduct.product_id || editProduct.id, data);
+      setEditOpen(false);
+      setEditProduct(null);
+      fetchProducts();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update product');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteProduct) return;
+    setDeleteSubmitting(true);
+    try {
+      await productService.remove(deleteProduct.product_id || deleteProduct.id);
+      setDeleteOpen(false);
+      setDeleteProduct(null);
+      fetchProducts();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete product');
+    } finally {
+      setDeleteSubmitting(false);
+    }
+  };
+
   return (
     <div className="dash-page">
       <ClientSidebar />
       <div className="dash-main">
         <Topbar title="Products" />
         <div className="dash-content">
-          <ControlsRow search={search} setSearch={setSearch} />
+          <ControlsRow
+            search={search}
+            setSearch={setSearch}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            sort={sort}
+            setSort={setSort}
+          />
           <ProductTable
             products={products}
             loading={loading}
@@ -308,6 +630,8 @@ const ProductManagement = () => {
             setPage={setPage}
             totalPages={totalPages}
             totalProducts={totalProducts}
+            onEdit={(p) => { setEditProduct(p); setEditOpen(true); }}
+            onDelete={(p) => { setDeleteProduct(p); setDeleteOpen(true); }}
           />
           <SummaryCards
             totalProducts={summary.total_products}
@@ -316,6 +640,23 @@ const ProductManagement = () => {
           />
         </div>
       </div>
+
+      <EditModal
+        open={editOpen}
+        onClose={() => { setEditOpen(false); setEditProduct(null); }}
+        product={editProduct}
+        categories={categories}
+        onSave={handleEdit}
+        submitting={editSubmitting}
+      />
+
+      <DeleteModal
+        open={deleteOpen}
+        onClose={() => { setDeleteOpen(false); setDeleteProduct(null); }}
+        product={deleteProduct}
+        onConfirm={handleDelete}
+        submitting={deleteSubmitting}
+      />
     </div>
   );
 };

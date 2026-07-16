@@ -61,11 +61,13 @@ const findAllByShop = async (shopId, filters = {}) => {
         params.push(filters.category_id);
     }
 
-    // Sort by quantity (highest or lowest)
+    // Sort
     if (filters.sort === 'quantity_asc') {
         sql += ' ORDER BY p.current_quantity ASC';
     } else if (filters.sort === 'quantity_desc') {
         sql += ' ORDER BY p.current_quantity DESC';
+    } else if (filters.sort === 'oldest') {
+        sql += ' ORDER BY p.created_at ASC';
     } else {
         sql += ' ORDER BY p.created_at DESC';
     }

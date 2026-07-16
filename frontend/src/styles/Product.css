@@ -345,6 +345,58 @@
   border-color: #ff6b00;
 }
 
+/* ── Category Dropdown ───────────────────────────────────────────────────── */
+
+.prd-filter-dropdown {
+  position: relative;
+}
+
+.prd-filter-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 180px;
+  max-height: 240px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #e2bfb0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  padding: 4px;
+}
+
+.prd-filter-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5f5e5e;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.1s ease;
+}
+
+.prd-filter-option:hover {
+  background-color: #f5f3f3;
+}
+
+.prd-filter-option--active {
+  background-color: #fff7ed;
+  color: #a04100;
+  font-weight: 600;
+}
+
+.prd-filter-option--active:hover {
+  background-color: #ffedd5;
+}
+
 .prd-add-btn {
   display: flex;
   align-items: center;
@@ -498,6 +550,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.prd-product-name:hover {
+  color: #ff6b00;
 }
 
 .prd-product-sku {
@@ -691,4 +749,204 @@
 
 .prd-summary-value--red {
   color: #b91c1c;
+}
+
+/* ── Product Modal ─────────────────────────────────────────────────────────── */
+
+.prd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.prd-modal {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2bfb0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 560px;
+  animation: prdModalIn 0.2s ease;
+}
+
+@keyframes prdModalIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.prd-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.prd-modal-title {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
+  color: #1b1c1c;
+  margin: 0;
+}
+
+.prd-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #5f5e5e;
+  transition: background-color 0.15s ease;
+}
+
+.prd-modal-close:hover {
+  background-color: #f5f3f3;
+}
+
+.prd-modal-body {
+  padding: 20px 24px;
+}
+
+.prd-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.prd-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prd-modal-field--full {
+  margin-top: 16px;
+}
+
+.prd-modal-label {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  color: #1b1c1c;
+}
+
+.prd-modal-required {
+  color: #b91c1c;
+}
+
+.prd-modal-input {
+  width: 100%;
+  padding: 9px 11px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #1b1c1c;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.prd-modal-input:focus {
+  border-color: #ff6b00;
+}
+
+.prd-modal-input--error {
+  border-color: #b91c1c;
+}
+
+.prd-modal-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='7.4' fill='none' viewBox='0 0 12 7.4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235F5E5E' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.prd-modal-textarea {
+  resize: vertical;
+  min-height: 56px;
+}
+
+.prd-modal-error {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+.prd-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 24px 20px;
+}
+
+.prd-modal-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border: none;
+}
+
+.prd-modal-btn--cancel {
+  background-color: #f5f3f3;
+  color: #5f5e5e;
+  border: 1px solid #e2bfb0;
+}
+
+.prd-modal-btn--cancel:hover {
+  background-color: #e4e2e2;
+}
+
+.prd-modal-btn--confirm {
+  background-color: #ff6b00;
+  color: #ffffff;
+}
+
+.prd-modal-btn--confirm:hover {
+  background-color: #e05e00;
+}
+
+.prd-modal-btn--delete {
+  background-color: #b91c1c;
+  color: #ffffff;
+}
+
+.prd-modal-btn--delete:hover {
+  background-color: #991b1b;
+}
+
+.prd-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.prd-delete-msg {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #5f5e5e;
+  margin: 0;
+}
+
+.prd-delete-msg strong {
+  color: #1b1c1c;
 }
