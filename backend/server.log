@@ -1,0 +1,8 @@
+{
+  host: undefined,
+  port: undefined,
+  user: undefined,
+  password: undefined,
+  database: undefined
+}
+TOKDAK server running on port 5000 and URL:http://localhost:5000

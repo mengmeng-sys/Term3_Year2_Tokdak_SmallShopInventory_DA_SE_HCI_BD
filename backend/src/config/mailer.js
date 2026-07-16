@@ -137,11 +137,52 @@ const emailTemplates = {
         `
     }),
     email_verify: (data) => ({
-        subject: 'Test OTP',
+        subject: 'TOKDAK Email Verification',
         html: `
-            <h1>TOKDAK Verification</h1>
-            <p>Hello ${data.name}</p>
-            <h2>${data.otp}</h2>
+        <div style="font-family: Arial, sans-serif; background:#f5f7fa; padding:40px;">
+            <div style="max-width:600px; margin:auto; background:white; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div style="background:#FF6B00; padding:25px; text-align:center;">
+                    <h1 style="color:white; margin:0;">TOKDAK</h1>
+                    <p style="color:#FFE7D1; margin-top:8px;">Email Verification</p>
+                </div>
+                <div style="padding:35px;">
+                    <h2 style="color:#333;">Hello ${data?.name || 'User'}! 👋</h2>
+                    <p style="color:#666; line-height:1.6;">
+                        Thank you for registering with TOKDAK. Please use the verification code below to activate your account:
+                    </p>
+                    <div style="text-align:center; margin:30px 0;">
+                        <span style="
+                            display:inline-block;
+                            background:#FFF3EB;
+                            color:#FF6B00;
+                            font-size:32px;
+                            font-weight:bold;
+                            letter-spacing:8px;
+                            padding:18px 30px;
+                            border-radius:12px;
+                        ">
+                            ${data?.otp || '000000'}
+                        </span>
+                    </div>
+                    <p style="color:#666;">
+                        This code will expire in <b>10 minutes</b>.
+                    </p>
+                    <div style="
+                        background:#FFF3EB;
+                        color:#FF6B00;
+                        padding:15px;
+                        border-radius:10px;
+                        margin-top:25px;
+                        font-weight:bold;
+                    ">
+                        🔒 Please verify your email to complete registration.
+                    </div>
+                </div>
+                <div style="background:#fafafa; padding:20px; text-align:center; color:#888; font-size:12px;">
+                    © TOKDAK Inventory System
+                </div>
+            </div>
+        </div>
         `
     })
 };

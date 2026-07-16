@@ -1,6 +1,6 @@
--- Tokdak Backup for Sokha Grocery
--- Shop ID: 2
--- Date: 07-14-26
+-- Tokdak Backup for Dara Mini Mart
+-- Shop ID: 1
+-- Date: 07-15-26
 -- ========================================================
 
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
@@ -46,10 +46,10 @@ CREATE TABLE `shops` (
 --
 -- Dumping data for table `shops`
 --
--- WHERE:  shop_id=2
+-- WHERE:  shop_id=1
 
 /*!40000 ALTER TABLE `shops` DISABLE KEYS */;
-INSERT INTO `shops` (`shop_id`, `user_id`, `shop_name`, `address`, `phone`, `logo_url`, `created_at`, `updated_at`) VALUES (2,3,'Sokha Grocery','Street 109, Phnom Penh','097654321',NULL,'2026-06-16 03:48:29','2026-06-16 03:48:29');
+INSERT INTO `shops` (`shop_id`, `user_id`, `shop_name`, `address`, `phone`, `logo_url`, `created_at`, `updated_at`) VALUES (1,2,'Dara Mini Mart','Street 271, Phnom Penh','012345678',NULL,'2026-06-16 03:48:29','2026-06-16 03:48:29');
 /*!40000 ALTER TABLE `shops` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -61,7 +61,7 @@ INSERT INTO `shops` (`shop_id`, `user_id`, `shop_name`, `address`, `phone`, `log
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-14 18:19:16
+-- Dump completed on 2026-07-15 13:48:50
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: mysql-1716ce50-na634997-4f35.e.aivencloud.com    Database: tokdak
@@ -100,10 +100,10 @@ CREATE TABLE `categories` (
 --
 -- Dumping data for table `categories`
 --
--- WHERE:  shop_id=2
+-- WHERE:  shop_id=1
 
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-INSERT INTO `categories` (`category_id`, `shop_id`, `name`, `created_at`) VALUES (5,2,'Grocery','2026-06-16 03:48:29'),(6,2,'Drinks','2026-06-16 03:48:29'),(7,2,'Personal Care','2026-06-16 03:48:29');
+INSERT INTO `categories` (`category_id`, `shop_id`, `name`, `created_at`) VALUES (1,1,'Grocery','2026-06-16 03:48:29'),(2,1,'Drinks','2026-06-16 03:48:29'),(3,1,'Snacks','2026-06-16 03:48:29'),(4,1,'Household','2026-06-16 03:48:29');
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -115,7 +115,7 @@ INSERT INTO `categories` (`category_id`, `shop_id`, `name`, `created_at`) VALUES
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-14 18:19:18
+-- Dump completed on 2026-07-15 13:48:52
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: mysql-1716ce50-na634997-4f35.e.aivencloud.com    Database: tokdak
@@ -167,10 +167,10 @@ CREATE TABLE `products` (
 --
 -- Dumping data for table `products`
 --
--- WHERE:  shop_id=2
+-- WHERE:  shop_id=1
 
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` (`product_id`, `shop_id`, `category_id`, `name`, `description`, `price`, `current_quantity`, `min_quantity`, `unit`, `created_at`, `updated_at`) VALUES (10,2,5,'Rice 10kg','Long grain white rice',20.00,8,10,'bag','2026-06-16 03:48:29','2026-06-16 03:48:29'),(11,2,5,'Salt 500g','Iodized table salt',0.50,15,5,'pack','2026-06-16 03:48:29','2026-06-16 03:48:29'),(12,2,6,'Orange Juice 1L','Fresh squeezed juice',2.50,3,8,'bottle','2026-06-16 03:48:29','2026-06-16 03:48:29'),(13,2,7,'Shampoo 200ml','Hair care shampoo',2.00,6,5,'bottle','2026-06-16 03:48:29','2026-06-16 03:48:29');
+INSERT INTO `products` (`product_id`, `shop_id`, `category_id`, `name`, `description`, `price`, `current_quantity`, `min_quantity`, `unit`, `created_at`, `updated_at`) VALUES (1,1,1,'Rice 5kg','Premium jasmine rice',12.50,20,10,'bag','2026-06-16 03:48:29','2026-06-20 09:16:08'),(2,1,1,'Cooking Oil 1L','Vegetable cooking oil',2.00,12,8,'bottle','2026-06-16 03:48:29','2026-06-20 09:18:20'),(3,1,1,'Sugar 1kg','White refined sugar',1.20,3,5,'bag','2026-06-16 03:48:29','2026-06-16 03:48:29'),(4,1,2,'Coca Cola 330ml','Soft drink can',0.75,24,12,'can','2026-06-16 03:48:29','2026-06-16 03:48:29'),(5,1,2,'Water 500ml','Mineral water bottle',0.30,48,20,'bottle','2026-06-16 03:48:29','2026-06-16 03:48:29'),(6,1,3,'Instant Noodles','Mama instant noodles',0.25,60,20,'pack','2026-06-16 03:48:29','2026-06-16 03:48:29'),(7,1,3,'Chips 50g','Potato chips snack',0.50,30,15,'pack','2026-06-16 03:48:29','2026-06-16 03:48:29'),(8,1,4,'Dish Soap 500ml','Liquid dish washing soap',1.50,5,5,'bottle','2026-06-16 03:48:29','2026-06-16 03:48:29'),(9,1,4,'Laundry Powder 1kg','Washing powder',3.00,1,5,'box','2026-06-16 03:48:29','2026-06-16 03:48:29');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -182,7 +182,7 @@ INSERT INTO `products` (`product_id`, `shop_id`, `category_id`, `name`, `descrip
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-14 18:19:19
+-- Dump completed on 2026-07-15 13:48:54
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: mysql-1716ce50-na634997-4f35.e.aivencloud.com    Database: tokdak
@@ -229,10 +229,10 @@ CREATE TABLE `stock_transactions` (
 --
 -- Dumping data for table `stock_transactions`
 --
--- WHERE:  product_id IN (SELECT product_id FROM products WHERE shop_id=2)
+-- WHERE:  product_id IN (SELECT product_id FROM products WHERE shop_id=1)
 
 /*!40000 ALTER TABLE `stock_transactions` DISABLE KEYS */;
-INSERT INTO `stock_transactions` (`transaction_id`, `product_id`, `user_id`, `type`, `quantity_changed`, `quantity_before`, `quantity_after`, `note`, `created_at`) VALUES (8,10,3,'restock',10,0,10,'Opening stock','2026-06-16 03:48:29'),(9,12,3,'sale',-5,8,3,'Daily sales','2026-06-16 03:48:29');
+INSERT INTO `stock_transactions` (`transaction_id`, `product_id`, `user_id`, `type`, `quantity_changed`, `quantity_before`, `quantity_after`, `note`, `created_at`) VALUES (1,1,2,'restock',20,0,20,'Initial stock from supplier A','2026-06-16 03:48:29'),(4,1,2,'sale',-5,20,15,'Daily sales','2026-06-16 03:48:29'),(5,1,2,'sale',-11,15,4,'Weekend sales','2026-06-16 03:48:29'),(14,1,2,'restock',20,4,24,'Restocked from supplier A','2026-06-20 08:38:49'),(15,1,2,'sale',-3,24,21,'sold to customer','2026-06-20 08:42:17'),(16,1,2,'sale',-21,21,0,'sold to customer','2026-06-20 08:47:57'),(17,1,2,'restock',10,0,10,'Restocked from supplier A','2026-06-20 09:10:43'),(18,1,2,'restock',10,10,20,'Restocked from supplier A','2026-06-20 09:16:08'),(2,2,2,'restock',10,0,10,'Initial stock','2026-06-16 03:48:29'),(6,2,2,'sale',-8,10,2,'Daily sales','2026-06-16 03:48:29'),(19,2,2,'restock',10,2,12,'Restocked from supplier A','2026-06-20 09:18:20'),(3,3,2,'restock',8,0,8,'Initial stock','2026-06-16 03:48:29'),(7,3,2,'sale',-5,8,3,'Daily sales','2026-06-16 03:48:29');
 /*!40000 ALTER TABLE `stock_transactions` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -244,7 +244,7 @@ INSERT INTO `stock_transactions` (`transaction_id`, `product_id`, `user_id`, `ty
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-14 18:19:21
+-- Dump completed on 2026-07-15 13:48:57
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: mysql-1716ce50-na634997-4f35.e.aivencloud.com    Database: tokdak
@@ -288,10 +288,10 @@ CREATE TABLE `shop_schedules` (
 --
 -- Dumping data for table `shop_schedules`
 --
--- WHERE:  shop_id=2
+-- WHERE:  shop_id=1
 
 /*!40000 ALTER TABLE `shop_schedules` DISABLE KEYS */;
-INSERT INTO `shop_schedules` (`schedule_id`, `shop_id`, `task_name`, `task_type`, `frequency`, `next_run_at`, `is_active`, `created_at`) VALUES (4,2,'Daily Backup','backup','daily','2026-07-15 07:00:14',1,'2026-06-16 03:48:30');
+INSERT INTO `shop_schedules` (`schedule_id`, `shop_id`, `task_name`, `task_type`, `frequency`, `next_run_at`, `is_active`, `created_at`) VALUES (1,1,'Daily Backup','backup','daily','2026-07-15 07:00:07',1,'2026-06-16 03:48:30'),(2,1,'Weekly Stock Report','report','weekly','2026-06-16 08:00:00',1,'2026-06-16 03:48:30'),(3,1,'Low Stock Alert Check','alert','daily','2026-06-14 08:00:00',1,'2026-06-16 03:48:30');
 /*!40000 ALTER TABLE `shop_schedules` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -303,4 +303,4 @@ INSERT INTO `shop_schedules` (`schedule_id`, `shop_id`, `task_name`, `task_type`
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-14 18:19:22
+-- Dump completed on 2026-07-15 13:48:58

@@ -467,7 +467,7 @@ const BackupManagement = () => {
           )}
         </div>
 
-        <div className="bm-footer">TOKDAK RETAIL SYSTEMS &copy; 2023 &bull; SECURE CLOUD STORAGE ENABLED</div>
+        <div className="bm-footer">TOKDAK RETAIL SYSTEMS &copy; {new Date().getFullYear()} &bull; SECURE CLOUD STORAGE ENABLED</div>
       </div>
 
       {showToast && (

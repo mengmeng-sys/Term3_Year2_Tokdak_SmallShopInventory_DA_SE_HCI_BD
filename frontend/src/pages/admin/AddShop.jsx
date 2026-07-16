@@ -275,7 +275,7 @@ const AddShop = () => {
           )}
         </div>
 
-        <div className="ans-footer">© 2024 TOKDAK Admin Portal. System Version 2.4.0-release</div>
+        <div className="ans-footer">© {new Date().getFullYear()} TOKDAK Admin Portal. System Version 2.4.0-release</div>
       </div>
 
       {success && (
