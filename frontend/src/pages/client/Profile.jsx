@@ -207,11 +207,14 @@ function ChangePasswordCard({ onChangePassword, changing, passwordMessage, onCan
 
 // ─── Edit Profile Form ────────────────────────────────────────────────────────
 
-function EditProfileForm({ name, email, dob, gender, onSave, saving, message }) {
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', birthDate: '', gender: '' });
+function EditProfileForm({ name, email, dob, gender, shopName, onSave, saving, message }) {
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', birthDate: '', gender: '', shopName: '' });
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (name) {
+    if (!name) return;
+    if (!initialized.current) {
+      initialized.current = true;
       const parts = name.split(' ');
       setForm({
         firstName: parts[0] || '',
@@ -219,9 +222,14 @@ function EditProfileForm({ name, email, dob, gender, onSave, saving, message }) 
         email: email || '',
         birthDate: dob || '',
         gender: gender || 'Male',
+        shopName: shopName || '',
       });
+      return;
     }
-  }, [name, email, dob, gender]);
+    if (shopName) {
+      setForm(prev => prev.shopName ? prev : { ...prev, shopName });
+    }
+  }, [name, email, dob, gender, shopName]);
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -233,6 +241,7 @@ function EditProfileForm({ name, email, dob, gender, onSave, saving, message }) 
       email: form.email,
       DOB: form.birthDate,
       gender: form.gender,
+      shop_name: form.shopName,
     });
   };
 
@@ -261,6 +270,12 @@ function EditProfileForm({ name, email, dob, gender, onSave, saving, message }) 
           <label className="p-field-label">Email</label>
           <div className="p-input-wrap">
             <input name="email" value={form.email} onChange={handleChange} className="p-input" />
+          </div>
+        </div>
+        <div className="p-field p-field-full">
+          <label className="p-field-label">Shop Name</label>
+          <div className="p-input-wrap">
+            <input name="shopName" value={form.shopName} onChange={handleChange} className="p-input" />
           </div>
         </div>
         <div className="p-form-row">
@@ -348,6 +363,8 @@ export default function Profile() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState('');
 
+  const originalRef = useRef({});
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [dob, setDob] = useState('');
@@ -364,6 +381,12 @@ export default function Profile() {
         const res = await authService.getMe();
         if (!mountedRef.current) return;
         const data = res.data?.data || res.data || {};
+        originalRef.current = {
+          name: data.name || user?.name || '',
+          email: data.email || user?.email || '',
+          DOB: data.DOB || '',
+          gender: data.gender || 'Male',
+        };
         setName(data.name || user?.name || '');
         setEmail(data.email || user?.email || '');
         setDob(data.DOB || '');
@@ -428,7 +451,31 @@ export default function Profile() {
     setSaving(true);
     setSaveMessage('');
     try {
-      await userService.update(user?.user_id, data);
+      const orig = originalRef.current;
+      const userData = {};
+      if (data.name !== orig.name) userData.name = data.name;
+      if (data.email !== orig.email) userData.email = data.email;
+      if (data.DOB !== (orig.DOB || '')) userData.DOB = data.DOB || null;
+      if (data.gender !== orig.gender) userData.gender = data.gender;
+
+      if (Object.keys(userData).length > 0) {
+        const res = await userService.update(user?.user_id, userData);
+        const updatedUser = res.data?.data;
+        if (updatedUser) {
+          originalRef.current = {
+            name: updatedUser.name ?? orig.name,
+            email: updatedUser.email ?? orig.email,
+            DOB: updatedUser.DOB ?? orig.DOB,
+            gender: updatedUser.gender ?? orig.gender,
+          };
+        }
+      }
+
+      if (shop?.shop_id && data.shop_name !== (shop?.shop_name || '')) {
+        await shopService.update(shop.shop_id, { shop_name: data.shop_name });
+        setShop(prev => prev ? { ...prev, shop_name: data.shop_name } : prev);
+      }
+
       setSaveMessage('Profile updated successfully. Logging out...');
       setTimeout(() => {
         logout();
@@ -492,6 +539,7 @@ export default function Profile() {
               </div>
               <EditProfileForm
                 name={name} email={email} dob={dob} gender={gender}
+                shopName={shop?.shop_name}
                 onSave={handleSave} saving={saving} message={saveMessage}
               />
               <div className="p-form-row">

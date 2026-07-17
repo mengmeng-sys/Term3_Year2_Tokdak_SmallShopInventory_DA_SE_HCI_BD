@@ -13,6 +13,9 @@ const login = async ( email , password) =>{
  if(!isMatch){
   throw {status: 401 , message : 'Invalid email or password'};
  }
+ if(!user.is_active){
+  throw {status: 403 , message : 'Account is inactive. Contact admin.'};
+ }
 
  const token = jwt.sign(
   {id :user.user_id, role:user.role},

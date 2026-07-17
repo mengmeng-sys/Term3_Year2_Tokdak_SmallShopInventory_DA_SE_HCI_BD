@@ -56,6 +56,8 @@ const AdminProfile = () => {
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
+  const originalRef = useRef({});
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [dob, setDob] = useState('');
@@ -81,6 +83,12 @@ const AdminProfile = () => {
         const res = await authService.getMe();
         if (!mountedRef.current) return;
         const data = res.data?.data || res.data || {};
+        originalRef.current = {
+          name: data.name || user?.name || '',
+          email: data.email || user?.email || '',
+          DOB: data.DOB || '',
+          gender: data.gender || 'Male',
+        };
         setName(data.name || user?.name || '');
         setEmail(data.email || user?.email || '');
         setDob(data.DOB || '');
@@ -117,10 +125,29 @@ const AdminProfile = () => {
     setSaving(true);
     setSaveMessage('');
     try {
-      const response = await userService.update(user?.user_id, { name, email, DOB: dob, gender });
+      const orig = originalRef.current;
+      const userData = {};
+      if (name !== orig.name) userData.name = name;
+      if (email !== orig.email) userData.email = email;
+      if (dob !== (orig.DOB || '')) userData.DOB = dob || null;
+      if (gender !== orig.gender) userData.gender = gender;
+
+      if (Object.keys(userData).length === 0) {
+        setSaveMessage('No changes to save');
+        setSaving(false);
+        return;
+      }
+
+      const response = await userService.update(user?.user_id, userData);
       const updatedUser = response.data?.data;
       if (updatedUser) {
         updateUser({ name: updatedUser.name, email: updatedUser.email });
+        originalRef.current = {
+          name: updatedUser.name ?? orig.name,
+          email: updatedUser.email ?? orig.email,
+          DOB: updatedUser.DOB ?? orig.DOB,
+          gender: updatedUser.gender ?? orig.gender,
+        };
       } else {
         updateUser({ name, email });
       }

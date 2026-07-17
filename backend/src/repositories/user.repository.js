@@ -45,12 +45,33 @@ const findById = async (userId) => {
 }
 
 const updateUser = async (userId, updateData) => {
-    const {name, email, DOB, gender } = updateData;
+    const fields = [];
+    const params = [];
 
+    if (updateData.name !== undefined) {
+        fields.push('name = ?');
+        params.push(updateData.name);
+    }
+    if (updateData.email !== undefined) {
+        fields.push('email = ?');
+        params.push(updateData.email);
+    }
+    if (updateData.DOB !== undefined) {
+        fields.push('DOB = ?');
+        params.push(updateData.DOB || null);
+    }
+    if (updateData.gender !== undefined) {
+        fields.push('gender = ?');
+        params.push(updateData.gender);
+    }
+
+    if (fields.length === 0) return { affectedRows: 0 };
+
+    params.push(userId);
     const [result] = await pool.query(
-        "UPDATE users set name = ?, email = ?, DOB = ?, gender = ? WHERE user_id = ?",
-        [name, email, DOB, gender, userId]
-    )
+        `UPDATE users SET ${fields.join(', ')} WHERE user_id = ?`,
+        params
+    );
     return result;
 }
 

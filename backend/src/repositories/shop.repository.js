@@ -65,10 +65,28 @@ const getShopStats = async (shopId) => {
 }
 
 const updateShop = async (shopId, updateData) => {
-    const { shop_name, address, phone } = updateData;
+    const fields = [];
+    const params = [];
+
+    if (updateData.shop_name !== undefined) {
+        fields.push('shop_name = ?');
+        params.push(updateData.shop_name);
+    }
+    if (updateData.address !== undefined) {
+        fields.push('address = ?');
+        params.push(updateData.address);
+    }
+    if (updateData.phone !== undefined) {
+        fields.push('phone = ?');
+        params.push(updateData.phone);
+    }
+
+    if (fields.length === 0) return { affectedRows: 0 };
+
+    params.push(shopId);
     const [result] = await pool.query(
-        'UPDATE shops SET shop_name = ?, address = ?, phone = ? WHERE shop_id = ?',
-        [shop_name, address, phone, shopId]
+        `UPDATE shops SET ${fields.join(', ')} WHERE shop_id = ?`,
+        params
     );
     return result;
 }
