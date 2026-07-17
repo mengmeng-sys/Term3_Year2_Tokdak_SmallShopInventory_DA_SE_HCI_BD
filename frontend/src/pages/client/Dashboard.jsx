@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../../components/common/Topbar';
 import ClientSidebar from '../../components/common/ClientSidebar';
+import StockAlertNotification from '../../components/client/StockAlertNotification';
 import dashboardService from '../../services/dashboardService';
 import { formatDateTime } from '../../utils/formatDate';
 import '../../styles/adminDashboard.css';
@@ -69,6 +70,7 @@ const ClientDashboard = () => {
 
       <div className="dash-main">
         <Topbar title="Dashboard Overview" />
+        <StockAlertNotification />
 
         <div className="dash-content">
           <div className="dash-page-header">
@@ -97,9 +99,6 @@ const ClientDashboard = () => {
           <div className="dash-table-section" style={{ marginBottom: 24 }}>
             <div className="dash-table-header">
               <h2 className="dash-table-title">Recent Alerts</h2>
-              <button onClick={() => navigate('/client/alerts')} className="dash-table-viewall">
-                View All
-              </button>
             </div>
             <div className="dash-table-container">
               <div className="dash-col-header-row" style={{ gridTemplateColumns: '1.5fr 2fr 1fr 1fr' }}>

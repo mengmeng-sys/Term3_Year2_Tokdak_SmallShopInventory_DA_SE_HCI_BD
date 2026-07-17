@@ -5,7 +5,7 @@ const getClientStats = async (shopId) => {
            'select count(*) as count from products where shop_id = ?',[shopId]
       );
       const [[lowStock]] = await pool.query(
-           'select count(*) as count from products where shop_id = ? AND current_quantity<= min_quantity AND current_quantity > 0',[shopId]
+           'select count(*) as count from products where shop_id = ? AND current_quantity < min_quantity AND current_quantity > 0',[shopId]
       );
       const [[outOfStock]] = await pool.query(
            'select count(*) as count from products where shop_id = ? AND current_quantity = 0',[shopId]
