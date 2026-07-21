@@ -1,0 +1,263 @@
+/* ─── Alert Center ─────────────────────────────────────────────────── */
+
+/* ── Summary cards ── */
+.alert-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.alert-summary-card {
+  background: #fff;
+  border: 1px solid #e2bfb0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  border-left-width: 4px;
+}
+
+.alert-summary-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0 0 8px;
+}
+
+.alert-summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+/* ── Filter tabs ── */
+.alert-filters {
+  display: inline-flex;
+  gap: 4px;
+  background: #f5f3f3;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.alert-filter-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f5e5e;
+  padding: 8px 18px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.alert-filter-btn.active {
+  background: #fff;
+  color: #ff6b00;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Alert table card ── */
+.alert-table-card {
+  background: #fff;
+  border: 1px solid #e2bfb0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.alert-table-head,
+.alert-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr 0.8fr 1.5fr;
+  align-items: center;
+}
+
+.alert-table-head {
+  background: #f5f3f3;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2bfb0;
+}
+
+.alert-th {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: #5f5e5e;
+  text-transform: uppercase;
+}
+
+.alert-table-row {
+  padding: 14px 24px;
+  border-top: 1px solid rgba(226, 191, 176, 0.2);
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.alert-table-row:hover {
+  background-color: #faf9f8;
+}
+
+.alert-table-row.alt {
+  background-color: #fafafa;
+}
+
+.alert-table-row:hover {
+  background-color: #f5f3f3;
+}
+
+.alert-cell {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #1b1c1c;
+  display: flex;
+  align-items: center;
+}
+
+.alert-cell--product {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.alert-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f5f3f3;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid #e2bfb0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5f5e5e;
+}
+
+.alert-product-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b1c1c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Type badge ── */
+.alert-type-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.alert-type-badge.out-of-stock {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.alert-type-badge.low-stock {
+  background: #fff8e1;
+  color: #f59e0b;
+}
+
+/* ── Stock info ── */
+.alert-stock-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alert-stock-current {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.alert-stock-current.critical {
+  color: #b91c1c;
+}
+
+.alert-stock-current.low {
+  color: #c2410c;
+}
+
+.alert-stock-min {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ── Action button ── */
+.alert-btn-restock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ff6b00;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.alert-btn-restock:hover {
+  background: #e05e00;
+}
+
+/* ── Empty state ── */
+.alert-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: #888;
+  font-family: "Inter", sans-serif;
+}
+
+.alert-empty-icon {
+  margin-bottom: 16px;
+  color: #c8c6c5;
+}
+
+.alert-empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #5f5e5e;
+  margin: 0 0 8px;
+}
+
+.alert-empty-text {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .alert-summary-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .alert-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .alert-table-head,
+  .alert-table-row {
+    grid-template-columns: 1.4fr 0.8fr 0.9fr 0.6fr 1fr;
+  }
+}

@@ -55,7 +55,7 @@ const StockAlertNotification = () => {
       if (next.length === 0) setDismissed(true);
       return next.length > 0 ? next : null;
     });
-    navigate('/client/stock');
+    navigate('/client/alerts');
   };
 
   if (!visible) return null;

@@ -99,6 +99,9 @@ const ClientDashboard = () => {
           <div className="dash-table-section" style={{ marginBottom: 24 }}>
             <div className="dash-table-header">
               <h2 className="dash-table-title">Recent Alerts</h2>
+              <button onClick={() => navigate('/client/alerts')} className="dash-table-viewall">
+                View All
+              </button>
             </div>
             <div className="dash-table-container">
               <div className="dash-col-header-row" style={{ gridTemplateColumns: '1.5fr 2fr 1fr 1fr' }}>
@@ -110,7 +113,7 @@ const ClientDashboard = () => {
                 recentAlerts.map((alert, i) => (
                   <div key={alert.alert_id || i} className={`dash-row ${i % 2 === 1 ? 'alt' : ''}`}
                     style={{ gridTemplateColumns: '1.5fr 2fr 1fr 1fr', cursor: 'pointer' }}
-                    onClick={() => navigate(`/client/products/${alert.product_id}`)}
+                    onClick={() => navigate(`/client/stock/restock/${alert.product_id}`)}
                   >
                     <div className="dash-cell bold">{alert.product_name}</div>
                     <div className="dash-cell">{alert.message}</div>
