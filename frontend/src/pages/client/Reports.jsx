@@ -62,6 +62,35 @@ const Reports = () => {
     return Number(n).toLocaleString('en-US');
   };
 
+  const exportCsv = () => {
+    if (history.length === 0) return;
+    const escape = (v) => {
+      const s = String(v ?? '');
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"`
+        : s;
+    };
+    const headers = ['Product', 'Type', 'Quantity', 'Unit', 'Note', 'Date'];
+    const rows = history.map((tx) => [
+      escape(tx.product_name),
+      escape(tx.type),
+      escape(tx.quantity_changed),
+      escape(tx.unit || 'pcs'),
+      escape(tx.note || ''),
+      escape(formatDateTime(tx.created_at)),
+    ]);
+    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transaction-history.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const totalPages = Math.ceil(history.length / PAGE_SIZE);
   const pagedHistory = history.slice((historyPage - 1) * PAGE_SIZE, historyPage * PAGE_SIZE);
 
@@ -202,6 +231,17 @@ const Reports = () => {
           <div className="rpt-history-card">
             <div className="rpt-history-header">
               <h3 className="rpt-history-title">Transaction History</h3>
+              <button
+                className="rpt-export-btn"
+                onClick={exportCsv}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export CSV
+              </button>
             </div>
 
             <div className="rpt-filters">

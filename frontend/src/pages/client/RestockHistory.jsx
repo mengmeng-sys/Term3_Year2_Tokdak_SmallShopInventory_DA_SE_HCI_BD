@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import ClientSidebar from '../../components/common/ClientSidebar';
 import stockService from '../../services/stockService';
 import { formatDateTime } from '../../utils/formatDate';
-import { Package, ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight, Bell, TrendingUp, TrendingDown } from 'lucide-react';
+import { Package, RefreshCw, ChevronLeft, ChevronRight, Bell, TrendingUp, TrendingDown } from 'lucide-react';
 import '../../styles/adminDashboard.css';
 import '../../styles/restock-history.css';
 
@@ -25,6 +25,7 @@ const getPalette = (id) => palette[id % palette.length];
 const RestockHistory = () => {
   const { user, getAvatarUrl } = useAuth();
   const mountedRef = useRef(true);
+  const allRowsRef = useRef([]);
 
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState([]);
@@ -38,23 +39,43 @@ const RestockHistory = () => {
   const [dateTo, setDateTo] = useState('');
   const [productFilter, setProductFilter] = useState('');
 
-  const loadHistory = async (page = 1) => {
+  const applyFilters = (rows) => {
+    let filtered = rows;
+    if (dateFrom) {
+      filtered = filtered.filter(h => h.created_at && new Date(h.created_at) >= new Date(dateFrom));
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(h => h.created_at && new Date(h.created_at) <= to);
+    }
+    if (productFilter.trim()) {
+      const q = productFilter.trim().toLowerCase();
+      filtered = filtered.filter(h => (h.product_name || '').toLowerCase().includes(q));
+    }
+    return filtered;
+  };
+
+  const paginate = (rows, page) => {
+    const totalItems = rows.length;
+    const tp = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    const start = (page - 1) * PAGE_SIZE;
+    return { page: rows.slice(start, start + PAGE_SIZE), totalPages: tp, total: totalItems };
+  };
+
+  const loadHistory = async () => {
     try {
       setLoading(true);
       const res = await stockService.getHistory();
       if (!mountedRef.current) return;
       const body = res?.data?.data || res?.data || [];
       const rows = Array.isArray(body) ? body : body.rows || [];
-      setTotal(rows.length);
-      setTotalAdded(rows.filter(h => h.quantity_changed > 0).reduce((acc, h) => acc + h.quantity_changed, 0));
-      setTotalSubtracted(rows.filter(h => h.quantity_changed < 0).reduce((acc, h) => acc + Math.abs(h.quantity_changed), 0));
-      setTotalPages(Math.max(1, Math.ceil(rows.length / PAGE_SIZE)));
-      const start = (page - 1) * PAGE_SIZE;
-      setHistory(rows.slice(start, start + PAGE_SIZE));
-      setCurrentPage(page);
+      allRowsRef.current = rows;
+      refreshPage();
     } catch (err) {
       if (!mountedRef.current) return;
       console.error('Error loading restock history:', err);
+      allRowsRef.current = [];
       setHistory([]);
       setTotal(0);
       setTotalPages(1);
@@ -63,19 +84,30 @@ const RestockHistory = () => {
     }
   };
 
+  const refreshPage = (page = currentPage) => {
+    const filtered = applyFilters(allRowsRef.current);
+    setTotalAdded(filtered.filter(h => h.quantity_changed > 0).reduce((acc, h) => acc + h.quantity_changed, 0));
+    setTotalSubtracted(filtered.filter(h => h.quantity_changed < 0).reduce((acc, h) => acc + Math.abs(h.quantity_changed), 0));
+    const { page: paged, totalPages: tp, total: t } = paginate(filtered, page);
+    setHistory(paged);
+    setTotalPages(tp);
+    setTotal(t);
+    setCurrentPage(Math.min(page, tp));
+  };
+
   useEffect(() => {
     mountedRef.current = true;
-    loadHistory(1);
+    loadHistory();
     return () => { mountedRef.current = false; };
   }, []);
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages || page === currentPage) return;
-    loadHistory(page);
+    refreshPage(page);
   };
 
   const handleApplyFilter = () => {
-    loadHistory(1);
+    refreshPage(1);
   };
 
   const buildPaginationItems = () => {
@@ -113,21 +145,6 @@ const RestockHistory = () => {
         <div className="dash-topbar" style={{ height: 64 }}>
           <div className="dash-topbar-title">Stock History</div>
           <div className="dash-topbar-actions">
-            <button
-              className="rh-btn-export"
-              onClick={() => {}}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '9px 17px', border: '1px solid #ff6b00',
-                borderRadius: 8, background: 'none', color: '#ff6b00',
-                fontSize: 14, fontWeight: 700, fontFamily: 'Inter, sans-serif',
-                cursor: 'pointer',
-              }}
-            >
-              <ArrowUpDown size={16} />
-              Export to CSV
-            </button>
-            <div style={{ width: 1, height: 24, backgroundColor: '#e2bfb0' }} />
             <button
               className="rh-bell-btn"
               style={{
