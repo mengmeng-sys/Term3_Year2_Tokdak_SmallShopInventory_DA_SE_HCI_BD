@@ -148,11 +148,23 @@ const deleteBackup = async (id) => {
     return await backupRepository.deleteBackup(id);
 };
 
+const deleteBatch = async (ids) => {
+    for (const id of ids) {
+        const backup = await backupRepository.getBackupById(id);
+        if (backup && backup.file_name) {
+            const filePath = path.join(BACKUP_DIR, backup.file_name);
+            await fs.unlink(filePath).catch(() => {});
+        }
+    }
+    return await backupRepository.deleteBatch(ids);
+};
+
 module.exports = {
     getAllBackups,
     getBackupStats,
     getBackupById,
     createBackup,
     getBackupFilePath,
-    deleteBackup
+    deleteBackup,
+    deleteBatch
 };

@@ -7,4 +7,6 @@ const create = (data) => api.post('/backups', data);
 const download = (id) => api.get(`/backups/${id}/download`, { responseType: 'blob' });
 const remove = (id) => api.delete(`/backups/${id}`);
 
-export default { getAll, getStats, getById, create, download, remove };
+const deleteBatch = (ids) => api.post('/backups/batch-delete', { ids });
+
+export default { getAll, getStats, getById, create, download, remove, deleteBatch };

@@ -77,10 +77,21 @@ const deleteBackup = async (backupId) => {
     return result.affectedRows;
 };
 
+const deleteBatch = async (ids) => {
+    if (!ids.length) return 0;
+    const placeholders = ids.map(() => '?').join(',');
+    const [result] = await pool.query(
+        `DELETE FROM backups WHERE backup_id IN (${placeholders})`,
+        ids
+    );
+    return result.affectedRows;
+};
+
 module.exports = {
     getAllBackups,
     getBackupStats,
     getBackupById,
     createBackup,
-    deleteBackup
+    deleteBackup,
+    deleteBatch
 };

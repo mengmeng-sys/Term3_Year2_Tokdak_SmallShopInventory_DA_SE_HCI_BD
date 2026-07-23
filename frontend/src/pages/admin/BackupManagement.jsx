@@ -132,6 +132,7 @@ const BackupManagement = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [shops, setShops] = useState([]);
   const [selectedShopId, setSelectedShopId] = useState('all');
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   const fetchBackups = async (page) => {
     const res = await backupService.getAll(page, PAGE_SIZE);
@@ -282,6 +283,44 @@ const BackupManagement = () => {
     }
   };
 
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === backups.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(backups.map(b => b.backup_id)));
+    }
+  };
+
+  const deleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.size} backup(s)?`)) return;
+    try {
+      const ids = Array.from(selectedIds);
+      await backupService.deleteBatch(ids);
+      setToastMsg(`${ids.length} backup(s) deleted`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      setSelectedIds(new Set());
+      await Promise.all([fetchBackups(currentPage), fetchStats()]);
+    } catch (err) {
+      console.error('Error deleting backups:', err);
+      setToastMsg('Failed to delete backups');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
+  const allSelected = backups.length > 0 && selectedIds.size === backups.length;
+
   const successRate = stats.total > 0
     ? ((stats.success_count / stats.total) * 100).toFixed(1) + '%'
     : '0%';
@@ -387,8 +426,19 @@ const BackupManagement = () => {
             </div>
           </div>
 
+          {selectedIds.size > 0 && (
+            <div className="bm-selected-bar">
+              <span className="bm-selected-count">{selectedIds.size} selected</span>
+              <button className="bm-btn-delete-selected" onClick={deleteSelected}>
+                Delete Selected
+              </button>
+            </div>
+          )}
           <div className="bm-table-wrap">
             <div className="bm-col-header-row">
+              <div className="bm-col-header bm-checkbox-cell">
+                <input type="checkbox" checked={allSelected} onChange={handleSelectAll} />
+              </div>
               {['File Name', 'Shop Name', 'File Size', 'Status', 'Date Created', 'Actions'].map((h, i) => (
                 <div key={h} className={`bm-col-header${i === 5 ? ' right' : ''}`}>{h}</div>
               ))}
@@ -396,6 +446,9 @@ const BackupManagement = () => {
             {backups.length > 0 ? (
               backups.map((b, i) => (
                 <div key={b.backup_id} className="bm-row" style={{ backgroundColor: i % 2 === 1 ? '#fafafa' : 'white' }}>
+                  <div className="bm-cell bm-checkbox-cell">
+                    <input type="checkbox" checked={selectedIds.has(b.backup_id)} onChange={() => toggleSelect(b.backup_id)} />
+                  </div>
                   <div className="bm-file-cell">
                     <FileIcon />
                     <span className="bm-file-name">{b.file_name}</span>

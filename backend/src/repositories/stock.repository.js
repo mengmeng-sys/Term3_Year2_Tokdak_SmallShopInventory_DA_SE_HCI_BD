@@ -49,7 +49,7 @@ const findLowStock = async (shopId) => {
         `SELECT p.*, c.name AS category_name
          FROM products p
          JOIN categories c ON p.category_id = c.category_id
-         WHERE p.shop_id = ? AND p.current_quantity <= p.min_quantity
+         WHERE p.shop_id = ? AND p.current_quantity < p.min_quantity AND p.current_quantity > 0
          ORDER BY p.current_quantity ASC`,
         [shopId]
     );

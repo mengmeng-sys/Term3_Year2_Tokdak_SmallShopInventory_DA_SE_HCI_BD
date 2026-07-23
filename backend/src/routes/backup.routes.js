@@ -61,6 +61,33 @@ router.get('/', authMiddleware, roleMiddleware('admin'), backupController.getAll
 
 /**
  * @swagger
+ * /api/backups/batch-delete:
+ *   post:
+ *     summary: Delete multiple backups (admin only)
+ *     tags: [Backups]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Backups deleted
+ *       400:
+ *         description: Invalid ids
+ */
+router.post('/batch-delete', authMiddleware, roleMiddleware('admin'), backupController.deleteBatch);
+
+/**
+ * @swagger
  * /api/backups/{id}:
  *   get:
  *     summary: Get a backup by ID (admin only)

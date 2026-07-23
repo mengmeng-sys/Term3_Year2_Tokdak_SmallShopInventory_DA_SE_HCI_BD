@@ -27,7 +27,7 @@ const restock = async (shopId, userId, productId, quantity, note) => {
     });
 
     // 4. If stock is now healthy, resolve any existing alerts for this product
-    if (quantityAfter > product.min_quantity) {
+    if (quantityAfter >= product.min_quantity) {
         await alertRepository.resolveByProduct(productId);
     }
 
@@ -66,7 +66,7 @@ const recordSale = async (shopId, userId, productId, quantity, note) => {
     // 3. Check if stock is now low or out — create alert if needed
     if (quantityAfter === 0) {
         await alertRepository.createIfNotExists(productId, shopId, 'out_of_stock');
-    } else if (quantityAfter <= product.min_quantity) {
+    } else if (quantityAfter < product.min_quantity) {
         await alertRepository.createIfNotExists(productId, shopId, 'low_stock');
     }
 

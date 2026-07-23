@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../../components/common/Topbar';
 import ClientSidebar from '../../components/common/ClientSidebar';
+import ManageStockModal from '../../components/common/ManageStockModal';
 import alertService from '../../services/alertService';
 import stockService from '../../services/stockService';
 import '../../styles/adminDashboard.css';
@@ -12,6 +13,7 @@ const AlertCenter = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [resolveProductId, setResolveProductId] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -50,7 +52,7 @@ const AlertCenter = () => {
           product_name: a.product_name,
           current_quantity: a.current_quantity,
           min_quantity: a.min_quantity,
-          alert_type: a.alert_type,
+          alert_type: a.type,
           alert_id: a.alert_id,
         });
       }
@@ -75,9 +77,14 @@ const AlertCenter = () => {
   const outOfStockCount = items.filter((a) => a.alert_type === 'out_of_stock').length;
   const lowStockCount = items.filter((a) => a.alert_type === 'low_stock').length;
 
-  const handleRestock = (e, productId) => {
+  const handleResolve = (e, productId) => {
     e.stopPropagation();
-    navigate(`/client/stock/restock/${productId}`);
+    setResolveProductId(productId);
+  };
+
+  const handleResolved = () => {
+    setResolveProductId(null);
+    fetchData();
   };
 
   if (loading) {
@@ -180,12 +187,12 @@ const AlertCenter = () => {
                   <div className="alert-cell">
                     <button
                       className="alert-btn-restock"
-                      onClick={(e) => handleRestock(e, item.product_id)}
+                      onClick={(e) => handleResolve(e, item.product_id)}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 5v14M5 12h14"/>
+                        <polyline points="20 6 9 17 4 12"/>
                       </svg>
-                      Restock
+                      Resolve
                     </button>
                   </div>
                 </div>
@@ -205,6 +212,14 @@ const AlertCenter = () => {
           )}
         </div>
       </div>
+
+      {resolveProductId && (
+        <ManageStockModal
+          productId={resolveProductId}
+          onClose={() => setResolveProductId(null)}
+          onUpdated={handleResolved}
+        />
+      )}
     </div>
   );
 };

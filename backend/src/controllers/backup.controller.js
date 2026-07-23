@@ -106,11 +106,34 @@ const deleteBackup = async (req, res, next) => {
     }
 };
 
+const deleteBatch = async (req, res, next) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'ids must be a non-empty array' });
+        }
+        const affected = await backupService.deleteBatch(ids);
+
+        activityService.logActivity(
+            req.user.id,
+            'delete_backup',
+            `Batch delete: ${affected} backup(s)`,
+            null,
+            null
+        ).catch(() => {});
+
+        res.status(200).json({ message: `${affected} backup(s) deleted` });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllBackups,
     getBackupStats,
     getBackupById,
     createBackup,
     downloadBackup,
-    deleteBackup
+    deleteBackup,
+    deleteBatch
 };
